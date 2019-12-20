@@ -1,0 +1,32 @@
+
+WIP
+	StoroWS
+		test retrieve index
+
+	production type
+		- who store param
+		- must allow to generate production using param
+		- production multiply out/in by level
+		- production must be searchable
+
+	world factory
+		- ProductionType.createSeller/Buyer
+
+	auth
+		- create password crypto
+		- create session
+		- restrict db acess by mask/scope
+
+FUTURE
+	auth
+		- improve password crypto (cf: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html) 
+	arrange prod
+		- transport easier on small object like jewelry
+		- add intellectual work
+		? add skill level requirement
+
+Question
+	? ingame date
+
+Feature
+	? recycle expression -> use as out node in semantique network to modify emotion/memory/etc...

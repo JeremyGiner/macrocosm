@@ -1,0 +1,22 @@
+
+
+<div class="container">
+	<div class="row">
+		<div class="col">
+			<form id="form-main" method="GET" action="/_game/test">
+				<input type="text" name="procedure" placeholder="procedure">
+				<input type="text" name="type" placeholder="type">
+				<input type="text" name="param" placeholder="param">
+				<textarea name="payload">{
+					"procedure": "controller.procedure.RetrieveIndex", 
+					"type": "unused",
+					"param": {
+						"storage": "Default"
+					}
+				}
+				</textarea>
+				<button type="submit">OK</button>
+			</form>
+		</div>
+	</div>
+</div>

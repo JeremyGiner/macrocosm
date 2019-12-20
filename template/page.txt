@@ -1,0 +1,10 @@
+
+::page.content::
+::if(page.hello)::
+Hello !
+::else::
+Not hello
+::endif::
+::for( sItem in page.array )::
+	<p>::sItem::</p>
+::endfor::

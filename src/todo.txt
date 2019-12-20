@@ -1,0 +1,41 @@
+
+
+validate procedure input
+output json or ribbon ? if json serialize type info
+scenario
+	- change player name
+
+
+Storo Admin
+- db access param 
+- 
+
+server
+	- authentify as
+	- logout
+	
+	- buy/sell building
+		- check player != null
+		- get cost
+		- check cost > player.credit
+		- substract cost
+		- create building
+
+model
+- storo DB
+	- constraint 
+		- uniq user.email
+	- index
+		- email
+- name/password/email
+controller
+- getter/setter scope
+	- create/delete user
+	- get user
+	- check user (password+login)
+	
+view 
+- login form
+- menu user
+	- html escape user name + logout
+	- login link

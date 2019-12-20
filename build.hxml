@@ -1,0 +1,22 @@
+
+#haxelib git sweet.functor https://github.com/JeremyGiner/sweet_functor.git
+
+-lib storo
+-lib rudy
+-cp src
+
+-main server.Main
+-hl bin/Main.hl
+
+#______________________________________________________________________________
+--next
+
+-lib unveil
+-cp src
+--resource template/page.txt@page
+--resource template/home.txt@home
+--resource template/home_form_signin.txt@home_form_signin
+--resource template/debug_ws_action.txt@debug_ws_action
+
+-main client.Main
+-js bin\_res\main.js
