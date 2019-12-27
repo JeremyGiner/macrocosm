@@ -1,0 +1,9 @@
+
+
+<form id="form_player_profile">
+<div class="form-group">
+	<label for="exampleInputPassword1">Login</label>
+	<input class="form-control" type="email" name="login" value="player.name">
+</div>
+<button type="submit" class="btn btn-primary">Submit</button>
+</form>

@@ -9,7 +9,7 @@ import rudyhh.Request;
 import rudyhh.RequestReader;
 import rudyhh.Response;
 import server.controller.IAction;
-import server.controller.procedure.Authentificate;
+import server.rudy.session.SessionManager;
 import sys.FileStat;
 import sys.FileSystem;
 import sys.net.Socket;
@@ -17,8 +17,9 @@ import sys.thread.Thread;
 import sys.io.File;
 import rudyhh.tool.HttpTool;
 import server.controller.Action;
-import server.controller.procedure.Authentificate.AccessDenied;
+import server.controller.Controller.AccessDenied;
 import server.controller.IAction.ActionType;
+import server.controller.Controller.SessionData;
 
 /**
  * ...
@@ -29,10 +30,12 @@ class RequestHandler implements IRequestHandler {
 	var _oParentThread :Thread;
 	
 	var _oController :Controller;
+	var _oSessionManager :SessionManager<SessionData>;
 	
 	public function new() {
 		_oParentThread = Thread.current();
 		_oController = new Controller();
+		_oSessionManager = new SessionManager<SessionData>('temp');
 	}
 	
 	public function handle( oClientSocket :Socket ) {//TODO : return child thread or something
@@ -41,6 +44,8 @@ class RequestHandler implements IRequestHandler {
 	}
 	
 	public function main( oClientSocket :Socket ) {
+		_oController.setConnectionInfo( oClientSocket.host() );
+		
 		// Read request
 		var oReader = new RequestReader( oClientSocket.input );
 		while (oReader.read() != State.Done ){}
@@ -63,6 +68,13 @@ class RequestHandler implements IRequestHandler {
 		// Trim URI
 		var sUri = oRequest.getUri();
 		
+		_oSessionManager.processRequest( oRequest );
+			
+		// DEBUG
+		//trace( _oSessionManager.test() );
+		//trace( _oSessionManager.getSession().getData() );
+		//trace( _oSessionManager.test() );
+		
 		//trace(oRequest.getHeaderMap());
 		
 		//_____________________________
@@ -79,8 +91,8 @@ class RequestHandler implements IRequestHandler {
 		}
 		
 		//_____________________________
-		// game action
-		if ( StringTools.startsWith( sUri, '/_game/' ) ) {
+		// game action (delegate to Controller)
+		if ( StringTools.startsWith( sUri, '/_game/' ) || sUri == '/_game' ) {
 			if ( oRequest.getBody() == null )
 				return new Response(400, 'Bad request', 'Request has no body');
 			
@@ -94,18 +106,18 @@ class RequestHandler implements IRequestHandler {
 				return new Response(400, 'Bad request', 'Expected parsable Action fomated in json ');
 			}
 			
-			var o = _oController.process( oAction );
+			var o = _oController.process( oAction, _oSessionManager );
 			if ( Std.is(o, UserMessage) ) {
 				return new Response(400, 'Bad request', 'user message : '+o.getMessage());
 			} else if ( Std.is(o, AccessDenied) ) {
 				return new Response(403, 'Access denied');
 			} else if ( Std.is(o, Error) ) {
 				// TODO : log message
-				trace(o.getMessage());
 				return new Response(500, 'Server internal error');
 			}
-			
-			return new Response( 200, 'OK', Json.stringify( o ) );
+			var oResponse = new Response( 200, 'OK', Json.stringify( o ) );
+			_oSessionManager.processResponse(oResponse);
+			return oResponse;
 		}
 		
 		//_____________________________

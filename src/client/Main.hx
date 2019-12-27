@@ -1,4 +1,6 @@
 package client;
+import client.controller.Signin;
+import client.controller.Signup;
 import haxe.Json;
 import js.Browser;
 import js.html.Element;
@@ -20,7 +22,7 @@ class Main {
 		
 		
 		//TODO : create context and model
-		new Unveil( [
+		var oUnveil = new Unveil( [
 			'home' => {
 				path_pattern: new RegExp('\\/'),
 				page_data: {
@@ -31,7 +33,7 @@ class Main {
 			},
 			'debug' => {
 				path_pattern: new RegExp('\\/debug'),
-				page_data: null
+				page_data: null,
 			},
 			'not_found' => {
 				path_pattern: new RegExp('\\/not-found'),
@@ -39,11 +41,13 @@ class Main {
 			}
 		], [
 			'home_form_signin' => Resource.getString('home_form_signin'),
+			'home_form_signup' => Resource.getString('home_form_signup'),
 			'home' =>  Resource.getString('home'),
 			'debug' => Resource.getString('debug_ws_action'),
 		]);
 		
-		
+		new Signin( oUnveil.getPageController() );
+		new Signup( oUnveil.getPageController() );
 		
 		function reqListener ( event ) {
 			Browser.console.log(event);
@@ -55,6 +59,8 @@ class Main {
 				return;
 				
 			event.preventDefault();
+			
+			
 			var oReq = new XMLHttpRequest();
 			oReq.addEventListener("load", reqListener);
 			oReq.open(

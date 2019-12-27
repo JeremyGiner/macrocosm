@@ -1,4 +1,5 @@
 package server.rudy.session;
+import haxe.crypto.Md5;
 import rudyhh.Request;
 import rudyhh.Response;
 
@@ -9,22 +10,22 @@ import rudyhh.Response;
 class SessionManager<CData> {
     
     var _oRequest :Request;
-    var _oRepository :ISessionRepository;
     var _oResponse :Response;
+    var _oRepository :ISessionRepository;
     var _oIdGenerator :SessionIdGenerator;
     
     var _sId :Null<String>;
+	var _oSession :Session<CData>;
     
     static var COOKIE_KEY = 'SESSID';
+	
+//_____________________________________________________________________________
+// Constructor
     
     public function new( 
-        oRequest :Request, 
-        oResponse :Response,
         sStoragePath :String,
         oRepository :ISessionRepository = null
     ) {
-        _oRequest = oRequest;
-        _oResponse = oResponse;
         _oRepository = oRepository == null ? 
             new SessionRepository( sStoragePath ) :
             oRepository
@@ -32,75 +33,103 @@ class SessionManager<CData> {
         _oIdGenerator = new SessionIdGenerator( _oRepository );
         
         _sId = null;
+		_oSession = null;
     }
+//_____________________________________________________________________________
+// Accessor
     
     public function getSession() :Session<CData> {
-    	var s = _getId();
-        
-        // Check length validity
-        if( s != null && s.length != 24 ) {
-            Singleton.getInst(Logger).logWarning('invalid SESSID found : "'+(s.length<200?s:(s.substr(0,200)+'...'))+'"');
-            s = null;
-        }
+		
+		// Load from cache
+		if ( _oSession != null )
+			return _oSession;
+		
         // Get active session
-        var o = _oRepository.get( s );
+		var s = _sId;
+		if ( s == null )
+			return null;
+        _oSession = cast _oRepository.load( s );
         
         // Case : no current session active, create one
-        if( o == null )
-            return _createSession();
-        
-        return o;
+        if( _oSession == null )
+            _oSession = _createSession();
+		
+        return _oSession;
         
     }
+	
+	public function test() {
+		return _oSession;
+	}
     
     public function destroySession() {
-        _oRepository.destroy( _getId() );
+        _oRepository.destroy( _sId );
     }
     
+//_____________________________________________________________________________
+// Processs
+
+	public function processRequest( oRequest :Request ) {
+		
+		_sId = _getId( oRequest );
+		_oSession = null;
+	}
+	
+	
+	public function processResponse( oResponse :Response ) {
+		if( _oSession == null )
+			throw 'Trying to set a response without contextual session';
+		oResponse.addCookie(COOKIE_KEY, _oSession.getId(), true);//TODO: only do it once
+        _oRepository.save( _oSession );
+	}
+	
+//_____________________________________________________________________________
+// Subroutine
+	
     /**
 	 * return current session id
 	 */
-    function _getId() {
-        if( _sId == null )
-            _sId = _oRequest.getCookie(COOKIE_KEY);
-        return _sId;
+    function _getId( oRequest :Request ) {
+		var iId :String = null;
+        if( iId == null )
+            iId = oRequest.getCookie(COOKIE_KEY);// Cookie: yummy_cookie=choco; tasty_cookie=strawberry
+		if ( iId == null ) 
+			iId = _oIdGenerator.generate( oRequest );
+        return iId;
     }
     
     function _createSession() {
-        var o = new Session<CData>( _oIdGenerator.generate( _oRequest.getPeerInfo() ) );
-        
-        _oResponse.setHeader('Set-Cookie',new SetCookie(COOKIE_KEY, o.getId()));
-        _oRepository.save( o );
-        _sId = o.getId();
+        var o = new Session<CData>( _sId );
+        _oRepository.save( o ); // necessary?
+		
         return o;
     }
 }
 
 class SessionIdGenerator {
     
-    var _oRepo :SessionRepository;
+    var _oRepo :ISessionRepository;
     
-    public function new( oRepo :SessionRepository ) {
+    public function new( oRepo :ISessionRepository ) {
         _oRepo = oRepo;
     }
     
-    public function generate( sPeerInfo :String ) {
+    public function generate( oRequest :Request ) {
         var s = '';
         var i = 0;
         do {
             s = 
-                sPeerInfo 
-                + Date.now().getTime()
-                + Math.random()
+                Date.now().getTime()
+                + ':' + Math.random()
             ;
-            s = haxe.crypto.Sha1( s );
+            s = haxe.crypto.Sha1.encode( s );
             i++;
             
             if( i > 100 )
                 throw '100th collision with ID:"'+s+'"';
         
         // check for collision
-        } while( _oRepo.get( s ) != null );
+        } while( _oRepo.exist( s ) );
         
         
         return s;

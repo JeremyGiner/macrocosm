@@ -8,7 +8,7 @@ class Player extends Entity {
 
 	var _oDynasty :Dynasty;
 	
-	public function new( sLabel, sPassword ) {
+	public function new( sLabel ) {
 		super( sLabel );
 		_oDynasty = null;
 	}

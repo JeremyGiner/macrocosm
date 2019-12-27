@@ -1,4 +1,5 @@
 package entity;
+import haxe.crypto.Sha256;
 
 /**
  * Special entity used to handle restricted access content
@@ -9,12 +10,10 @@ class Auth {
 	var _oPlayer :Player;
 	var _sEmail :String;	// prime index
 	var _sPasswordShadow :String;
-	var _bValidated :Bool;
 	
 	public function new( sEmail :String, sPassword :String ) {
 		_sEmail = sEmail;
 		_sPasswordShadow = encode(sPassword);
-		_bValidated = false;
 		_oPlayer = null;
 	}
 	
@@ -32,6 +31,21 @@ class Auth {
 	
 	static public function encode( s :String ) {
 		//TODO : use salt
-		return Crypto.encrypt( s );
+		// TODO : use BScript?
+		return Sha256.encode( s );
+	}
+	
+//_____________________________________________________________________________
+// Modifier
+
+	public function setPlayer( oPlayer :Player ) {
+		_oPlayer = oPlayer;
+	}
+	
+//_____________________________________________________________________________
+// Process
+
+	public function validatePassword( sPassword :String ) {
+		return encode( sPassword ) == _sPasswordShadow;
 	}
 }
