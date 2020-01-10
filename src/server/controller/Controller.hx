@@ -31,6 +31,7 @@ import entity.part.TileCapacityOvercrowd;
 import server.controller.IAction.ActionType;
 import sys.net.Host;
 import entity.*;
+import entity.worldmap.*;
 
 typedef SessionData = {
 	var auth_level :Int; // TODO : 
@@ -71,6 +72,8 @@ class Controller {
 		RibbonMacro.setMappingInfo( oMappingProvider, ProductionType );
 		RibbonMacro.setMappingInfo( oMappingProvider, Productor );
 		RibbonMacro.setMappingInfo( oMappingProvider, ProductorType );
+		RibbonMacro.setMappingInfo( oMappingProvider, Worldmap );
+		RibbonMacro.setMappingInfo( oMappingProvider, Sector );
 		
 		_oDatabase = new Database( oMappingProvider );
 		_oDatabase.setStorage('entity.Auth', new StorageString<Auth>(

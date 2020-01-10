@@ -1,4 +1,11 @@
 package server.controller.procedure;
+import haxe.Json;
+import haxe.Serializer;
+import entity.worldmap.Worldmap;
+import entity.worldmap.Sector;
+import haxe.ds.StringMap;
+
+import haxe.CallStack;
 
 /**
  * ...
@@ -7,16 +14,26 @@ package server.controller.procedure;
 
  typedef DbGetObj = {
 	var storage :String;
-	var id :Int;
+	var id :Dynamic;
 }
  
 class RetrieveObject extends AControllerProcedure<DbGetObj> {
 	
-	override public function process( o :DbGetObj ) {
+	static public var toto :Sector = null;
+	static public var titi :StringMap<Sector> = null;
+	
+	override public function process( o :DbGetObj ) :Dynamic {
 		
 		// TODO : deny access on Auth
-		var oDatabase = _oController.getDatabase();
-		var o = oDatabase.get( o.storage, o.id );
-		return o;
+		var oData = null;
+		try{
+			var oDatabase = _oController.getDatabase();
+			oData = oDatabase.get( o.storage, o.id );//TODO : usee mut get instead
+		} catch ( e :Dynamic ) {
+			trace(CallStack.toString(CallStack.exceptionStack()));
+			trace(e);
+		}
+		return oData;
 	}
+	
 }

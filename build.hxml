@@ -4,6 +4,7 @@
 -lib storo
 -lib rudy
 -cp src
+-cp vendor
 
 -main server.Main
 -hl bin/Main.hl
@@ -11,11 +12,20 @@
 #______________________________________________________________________________
 --next
 
+# require by ForTemplate 
+# TODO : move int o class file
+--macro keep('haxe.ds.IntMap')
+--macro keep('haxe.ds.StringMap')
+
 -lib unveil
 -cp src
 --resource template/page.txt@page
 --resource template/home.txt@home
 --resource template/home_form_signin.txt@home_form_signin
+--resource template/home_form_signup.txt@home_form_signup
+--resource template/worldmap_sector.txt@worldmap_sector
+--resource template/worldmap_map.txt@worldmap_map
+--resource template/worldmap.txt@worldmap
 --resource template/debug_ws_action.txt@debug_ws_action
 
 -main client.Main

@@ -1,21 +1,29 @@
 
 WIP
-	StoroWS
-		test retrieve index
-
+	productor
+		create storare for productor type? 
+		get player
+			- get player at signin/signup
+			
+		get productor
+			- get player productor
+		persit productor
+			- create client controller
+		- restrict access
+		
 	production type
 		- who store param
 		- must allow to generate production using param
 		- production multiply out/in by level
 		- production must be searchable
-
+	template
+		- haxe ressource every file in template directory (using macro?)
 	world factory
 		- ProductionType.createSeller/Buyer
 
 	auth
-		- create password crypto
-		- create session
 		- restrict db acess by mask/scope
+		- limit field size/characterset of free field like player.label
 
 FUTURE
 	auth

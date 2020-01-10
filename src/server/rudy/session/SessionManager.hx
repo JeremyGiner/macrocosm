@@ -77,10 +77,11 @@ class SessionManager<CData> {
 	
 	
 	public function processResponse( oResponse :Response ) {
-		if( _oSession == null )
+		if( _oSession == null && _sId == null )
 			throw 'Trying to set a response without contextual session';
-		oResponse.addCookie(COOKIE_KEY, _oSession.getId(), true);//TODO: only do it once
-        _oRepository.save( _oSession );
+		oResponse.addCookie(COOKIE_KEY, _sId, true);//TODO: only do it once
+		if( _oSession != null )
+			_oRepository.save( _oSession );
 	}
 	
 //_____________________________________________________________________________

@@ -1,6 +1,7 @@
 package entity;
 import entity.part.TileCapacityRequirement;
 import entity.TileCapacityType;
+import entity.worldmap.WorldmapGenerator;
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;
 
@@ -19,7 +20,7 @@ class WorldFactory {
 	public function create() :StringMap<Iterable<Dynamic>> {
 		var a :Array<Dynamic>;
 		
-		new Worldmap();// TODO : use WorldmapGenerator
+		var oWorldmap = new WorldmapGenerator().generate();// TODO : use WorldmapGenerator
 		
 		var mTileCapacityType :IntMap<TileCapacityType> = [
 			1 => new TileCapacityType('grassland'), // 33
@@ -358,6 +359,7 @@ new ProductorType(6,'contract : manual labor',0,0,null),
 		//TODO: return world
 		
 		return [
+			'worldmap' => [oWorldmap],
 			'tile_capacity_type' => mTileCapacityType,
 			'product_type' => mProductType,
 			'production_type' => aProductionType,

@@ -1,0 +1,30 @@
+
+<table class="sector">
+<tbody>
+	:: for row in sector.locationAr ::
+	<tr>
+		:: for sector_location in row ::
+		<td class="">
+			:: if sector_location.city != null ::
+			<div class="map-cell sprite sprite-city" 
+				style="background-color: rgba( 128, 128, 128)"
+			></div>
+			:: endif ::
+			
+			:: if sector_location.pawn ::
+			<div class="map-cell sprite sprite-production"></div>
+			:: endif ::
+			
+			:: if page.worldmap.link == null ::
+			<div class="map-cell"></div>
+			:: else ::
+			<a class="map-cell" href=":: worldmap.link ::?location={{ oTile.getLocation() }}">
+			</a>
+			:: endif ::
+		</td>
+		:: endfor ::
+	</tr>
+	:: endfor ::
+</tbody>
+</table>
+<!-- TODO : highlight tile feature; use as input feature --->

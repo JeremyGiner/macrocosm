@@ -3,7 +3,6 @@ import haxe.CallStack;
 import haxe.Json;
 import haxe.io.Bytes;
 import haxe.io.Path;
-import server.controller.Controller;
 import rudyhh.IRequestHandler;
 import rudyhh.Request;
 import rudyhh.RequestReader;
@@ -20,6 +19,7 @@ import server.controller.Action;
 import server.controller.Controller.AccessDenied;
 import server.controller.IAction.ActionType;
 import server.controller.Controller.SessionData;
+import server.controller.Controller;
 
 /**
  * ...
@@ -116,6 +116,7 @@ class RequestHandler implements IRequestHandler {
 				return new Response(500, 'Server internal error');
 			}
 			var oResponse = new Response( 200, 'OK', Json.stringify( o ) );
+			oResponse.setHeader('Content-Type', 'application/json');
 			_oSessionManager.processResponse(oResponse);
 			return oResponse;
 		}

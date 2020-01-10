@@ -1,7 +1,9 @@
 package client;
 import client.controller.Signin;
 import client.controller.Signup;
+import client.view.WorldmapViewBuilder;
 import haxe.Json;
+import haxe.ds.StringMap;
 import js.Browser;
 import js.html.Element;
 import js.html.Event;
@@ -10,6 +12,8 @@ import js.lib.RegExp;
 import unveil.template.Compiler;
 import unveil.Unveil;
 import haxe.Resource;
+import unveil.loader.LoaderXhrJson;
+import sweet.functor.builder.IBuilder;
 
 /**
  * ...
@@ -22,29 +26,53 @@ class Main {
 		
 		
 		//TODO : create context and model
-		var oUnveil = new Unveil( [
-			'home' => {
-				path_pattern: new RegExp('\\/'),
-				page_data: {
-					hello: true,
-					content: 'page content',
-					array: ['item0','item1'],
+		var oUnveil = new Unveil( 
+			[
+				'worldmap' => new LoaderXhrJson('POST', '/_game', [], {
+					procedure: "server.controller.procedure.RetrieveObject", 
+					type: "unused",
+					param: {
+						storage: 'Default',
+						id: -1,
+					},
+				})
+			],
+			[
+				'home' => {
+					path_pattern: new RegExp('\\/'),
+					page_data: {
+						hello: true,
+						content: 'page content',
+						array: ['item0','item1'],
+					},
+					model_load: null,
+				},
+				'worldmap' => {
+					path_pattern: new RegExp('\\/worldmap'),
+					page_data: null,
+					model_load: ['worldmap' => new WorldmapViewBuilder()],
+				},
+				'debug' => {
+					path_pattern: new RegExp('\\/debug'),
+					page_data: null,
+					model_load: null,
+				},
+				'not_found' => {
+					path_pattern: new RegExp('\\/not-found'),
+					page_data: null,
+					model_load: null,
 				}
-			},
-			'debug' => {
-				path_pattern: new RegExp('\\/debug'),
-				page_data: null,
-			},
-			'not_found' => {
-				path_pattern: new RegExp('\\/not-found'),
-				page_data: null,
-			}
-		], [
-			'home_form_signin' => Resource.getString('home_form_signin'),
-			'home_form_signup' => Resource.getString('home_form_signup'),
-			'home' =>  Resource.getString('home'),
-			'debug' => Resource.getString('debug_ws_action'),
-		]);
+			], [
+				{key: 'worldmap_sector', template: Resource.getString('worldmap_sector')},
+				{key: 'worldmap_map', template: Resource.getString('worldmap_map')},
+				{key: 'worldmap', template: Resource.getString('worldmap')},
+				{key: 'home_form_signin', template: Resource.getString('home_form_signin')},
+				{key: 'home_form_signup', template: Resource.getString('home_form_signup')},
+				{key: 'home', template: Resource.getString('home')},
+				{key: 'asset', template: Resource.getString('asset')},
+				{key: 'debug', template: Resource.getString('debug_ws_action')},
+			]
+		);
 		
 		new Signin( oUnveil.getPageController() );
 		new Signup( oUnveil.getPageController() );

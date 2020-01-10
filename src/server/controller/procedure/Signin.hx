@@ -21,7 +21,7 @@ class Signin extends AControllerProcedure<SigninParam> {
 		if( o.login != null ) {
 		
 			var oDatabase = getController().getDatabase();
-			var oAuth = oDatabase.get( 'Auth', o.login );//TODO :load player
+			oAuth = oDatabase.get( 'Auth', o.login );//TODO :load player
 			
 			if( 
 				oAuth == null

@@ -1,0 +1,15 @@
+
+<table class="map hajust-square">
+<tbody>
+	:: for( row in page.worldmap.sectorAr ) ::
+	<tr>
+		:: for( sector in row ) ::
+		<td class="">
+			:: render( worldmap_sector ) ::
+		</td>
+		:: endfor ::
+	</tr>
+	:: endfor ::
+</tbody>
+</table>
+<!-- TODO : highlight tile feature; use as input feature --->
