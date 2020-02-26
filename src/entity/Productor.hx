@@ -1,4 +1,5 @@
 package entity;
+import entity.worldmap.Tile;
 import sweet.functor.validator.IValidator;
 
 /**
@@ -10,12 +11,33 @@ class Productor extends Pawn {
 	var _oType :ProductorType;
 	var _iLevel :Int;
 	//var _aWorker :Array<Character>;
-	var _iCurrentPorduction :Int; //Index
+	var _iCurrentProduction :Int; //Index
 	
 	var _oTileRequirement :IValidator<Tile>;
 	
-	public function new( sLabel :String, oOwner :Dynasty, aLocation :Array<Location>  ) {
+//_____________________________________________________________________________
+//	Constructor
+	
+	public function new( 
+		sLabel :String, 
+		oOwner :Dynasty, 
+		aLocation :Array<Location>,
+		oType :ProductorType
+	) {
 		super( sLabel, oOwner, aLocation );
+		_oType = oType;
+		_iLevel = 1;
+		_iCurrentProduction = 0;
+	}
+	
+//_____________________________________________________________________________
+//	Accessor
+	
+	public function getCurrentProduction() {
+		var a = _oType.getProductionType();
+		if ( a.length <= _iCurrentProduction ) 
+			return null;
+		return a[_iCurrentProduction];
 	}
 	// TODO
 }

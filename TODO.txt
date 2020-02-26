@@ -1,5 +1,10 @@
 
 WIP
+	redirect page to player profile if player is null
+	player creation
+		- using PersistObject to persist player/dynasty/character ?
+		- return player / dynasty / character ? which format ? view on the backend side?
+
 	productor
 		create storare for productor type? 
 		get player

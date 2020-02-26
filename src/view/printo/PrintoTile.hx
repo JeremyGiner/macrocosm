@@ -1,5 +1,5 @@
 package view.printo;
-import entity.Tile;
+import entity.worldmap.Tile;
 
 /**
  * ...

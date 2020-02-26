@@ -47,8 +47,6 @@ class Tile {
 		mProductCapacity :IntMap<Int>
 	) {
 		Macro.ParamAssign();
-		trace('_________');
-		trace(mProductCapacity);
 		
 	}
 	

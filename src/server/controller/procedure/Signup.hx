@@ -35,14 +35,23 @@ class Signup extends AControllerProcedure<SignupParam> {
 		oDatabase.flush();
 		
 		// TODO: send confirmation email
+		
+		// Store in session
+		// TODO : merge this block with Signup
 		var oData = _oController.getSession().getData();
+		var iPlayerId = (oAuth.getPlayer() != null ? oAuth.getPlayer().getId() : null);
 		if ( oData == null )
-			oData = {auth_level: 1};
-		else
+			oData = {
+				auth_level: 1, 
+				player_id: iPlayerId,
+			};
+		else {
 			oData.auth_level = 1;
+			oData.player_id = iPlayerId;
+		}
 		_oController.getSession().setData( oData );
 		
 		
-		return o;
+		return oAuth;
 	}
 }

@@ -1,37 +1,30 @@
 package client.view;
+import client.response_body_decoder.ResponseBodyRibbon;
 import haxe.DynamicAccess;
 import haxe.ds.IntMap;
 import haxe.ds.StringMap;
 import sweet.functor.builder.IBuilder;
 import tool.Tool;
 import entity.worldmap.Tile.CapacityType;
-
-typedef Worldmap = {
-	var _mSector :DynamicAccess<Sector>;
-}
-typedef Sector = {
-	var _x :Int;
-	var _y :Int;
-	var _mTile :DynamicAccess<Tile>;
-}
-
-typedef Tile = {
-	var _x :Int;
-	var _y :Int;
-	var _fElevation :Float;
-	var _fHumidity :Float;
-	var _fTemperature :Float;
-	var _mProductCapacity :IntMap<Int>;
-}
+import js.html.XMLHttpRequest;
+import entity.worldmap.Tile;
+import entity.worldmap.Sector;
+import entity.worldmap.Worldmap;
 
 /**
  * ...
  * @author ...
  */
-class WorldmapViewBuilder implements IBuilder<Dynamic,Worldmap> {
+class WorldmapViewBuilder extends ResponseBodyRibbon {
 
 	public function new() {
+		super();
+	}
+	
+	override public function apply( oReq :XMLHttpRequest ) {
+		var oWorldmap :Worldmap = cast super.apply( oReq );
 		
+		return create( oWorldmap );
 	}
 	
 	public function create( o :Worldmap = null ) :Dynamic {
@@ -42,10 +35,10 @@ class WorldmapViewBuilder implements IBuilder<Dynamic,Worldmap> {
 		//oView.sector 
 		// TODO
 		var oWorldmap = o;
-		for ( oSector in oWorldmap._mSector ) {
-			if ( !oView.sectorAr.exists(oSector._y) ) 
-				oView.sectorAr.set(oSector._y,new IntMap<Dynamic>());
-			oView.sectorAr.get(oSector._y).set(oSector._x, getSectorView(oSector));
+		for ( oSector in oWorldmap.getSectorMap() ) {
+			if ( !oView.sectorAr.exists(oSector.getY()) ) 
+				oView.sectorAr.set(oSector.getY(),new IntMap<Dynamic>());
+			oView.sectorAr.get(oSector.getY()).set(oSector.getX(), getSectorView(oSector));
 		}
 		return oView;
 		/* 
@@ -62,10 +55,10 @@ class WorldmapViewBuilder implements IBuilder<Dynamic,Worldmap> {
 	
 	public function getSectorView( oSector :Sector ) {
 		var aTile = new IntMap<IntMap<Dynamic>>();
-		for ( oTile in oSector._mTile ) {
-			if ( !aTile.exists(oTile._y) ) 
-				aTile.set(oTile._y,new IntMap<Dynamic>());
-			aTile.get(oTile._y).set( oTile._x, createTileView(oTile));
+		for ( oTile in oSector.getTileMap() ) {
+			if ( !aTile.exists(oTile.getY()) ) 
+				aTile.set(oTile.getY(),new IntMap<Dynamic>());
+			aTile.get(oTile.getY()).set( oTile.getX(), createTileView(oTile));
 		}
 		return {
 			locationAr: aTile,
@@ -95,9 +88,9 @@ class WorldmapViewBuilder implements IBuilder<Dynamic,Worldmap> {
 		return aColor;
 		*/
 		
-		var fTemp = oTile._fTemperature;
-		var fElevation = oTile._fElevation;
-		var fHumi = oTile._fHumidity;
+		var fTemp = oTile.getTemperature();
+		var fElevation = oTile.getElevation();
+		var fHumi = oTile.getHumidity();
 		
 		var aColor = [0,0,0];
 		
@@ -138,7 +131,7 @@ class WorldmapViewBuilder implements IBuilder<Dynamic,Worldmap> {
 		);
 		
 		// Vegetation
-		var iField = oTile._mProductCapacity.get( cast CapacityType.FIELD);
+		var iField = oTile.getCapacity( cast CapacityType.FIELD);
 		if( iField != null )
 			aColor = _interpolateColor(
 				aColor, 
@@ -147,7 +140,7 @@ class WorldmapViewBuilder implements IBuilder<Dynamic,Worldmap> {
 			);
 		
 		//forest
-		var iForest = oTile._mProductCapacity.get( cast CapacityType.FOREST);
+		var iForest = oTile.getCapacity( cast CapacityType.FOREST);
 		if( iForest != null )
 		aColor = _interpolateColor(
 			aColor,

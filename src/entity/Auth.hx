@@ -10,12 +10,20 @@ class Auth {
 	var _oPlayer :Player;
 	var _sEmail :String;	// prime index
 	var _sPasswordShadow :String;
+	var _iAuthLevel :Int; // 0: annonymous, 1: player, 2: admin
 	
-	public function new( sEmail :String, sPassword :String ) {
+//_____________________________________________________________________________
+// Constructor
+	
+	public function new( sEmail :String, sPassword :String, iAuthLevel :Int = 1 ) {
 		_sEmail = sEmail;
 		_sPasswordShadow = encode(sPassword);
+		_iAuthLevel = iAuthLevel;
 		_oPlayer = null;
 	}
+	
+//_____________________________________________________________________________
+// Accessor
 	
 	public function getEmail() {
 		return _sEmail;
@@ -23,6 +31,10 @@ class Auth {
 	
 	public function getPasswordShadow() {
 		return _sPasswordShadow;
+	}
+	
+	public function getLevel() {
+		return _iAuthLevel;
 	}
 	
 	public function getPlayer() {

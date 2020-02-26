@@ -1,16 +1,18 @@
 package server.controller;
-import haxe.CallStack;
-import haxe.crypto.Md5;
-import haxe.io.Path;
 import logger.Logger;
+import haxe.CallStack;
+import haxe.io.Path;
+import haxe.ds.StringMap;
 import server.controller.procedure.InitWorld;
 import server.controller.procedure.PersistObject;
 import server.controller.procedure.RetrieveIndex;
 import server.controller.procedure.RetrieveObject;
-import haxe.ds.StringMap;
 import server.controller.procedure.Signin;
 import server.controller.procedure.Signup;
+import server.controller.procedure.Signout;
 import server.database.AuthEntityKeyProvider;
+import entity.mapper.ClientMappingInfoProvider;
+import server.database.DatabaseMappingInfoProvider;
 import server.rudy.session.Session;
 import rudyhh.Response;
 import server.rudy.session.SessionManager;
@@ -25,9 +27,8 @@ import sweet.functor.validator.Const;
 import sweet.ribbon.MappingInfoProvider;
 import server.controller.procedure.AControllerProcedure;
 import sweet.ribbon.RibbonMacro;
-import sweet.ribbon.MappingInfo;
-import entity.part.TileCapacityRequirement;
-import entity.part.TileCapacityOvercrowd;
+import sys.FileSystem;
+
 import server.controller.IAction.ActionType;
 import sys.net.Host;
 import entity.*;
@@ -35,7 +36,7 @@ import entity.worldmap.*;
 
 typedef SessionData = {
 	var auth_level :Int; // TODO : 
-	
+	var player_id :Int;
 }
 
 /**
@@ -59,36 +60,12 @@ class Controller {
 		_oClientInfo = null;
 		_oSessionManager = null;
 		
-		var oMappingProvider = new MappingInfoProvider();
-		
-		// TOOD : automatise
-		RibbonMacro.setMappingInfo( oMappingProvider, Auth );
-		RibbonMacro.setMappingInfo( oMappingProvider, TileCapacityRequirement );
-		RibbonMacro.setMappingInfo( oMappingProvider, Tile );
-		RibbonMacro.setMappingInfo( oMappingProvider, TileCapacityOvercrowd );
-		RibbonMacro.setMappingInfo( oMappingProvider, TileCapacityType );
-		RibbonMacro.setMappingInfo( oMappingProvider, ProductType );
-		RibbonMacro.setMappingInfo( oMappingProvider, Production );
-		RibbonMacro.setMappingInfo( oMappingProvider, ProductionType );
-		RibbonMacro.setMappingInfo( oMappingProvider, Productor );
-		RibbonMacro.setMappingInfo( oMappingProvider, ProductorType );
-		RibbonMacro.setMappingInfo( oMappingProvider, Worldmap );
-		RibbonMacro.setMappingInfo( oMappingProvider, Sector );
-		
-		_oDatabase = new Database( oMappingProvider );
-		_oDatabase.setStorage('entity.Auth', new StorageString<Auth>(
-			_oDatabase,
-			'entity.Auth',
-			new Path('Auth.storage'),
-			_oDatabase.getDefaultEncoder(),
-			_oDatabase.getDefaultDecoder(),
-			new AuthEntityKeyProvider()
-		) );
+		_oDatabase = new Database();
 		
 		
 		
 		// World generation
-		if ( false ) {
+		if ( !FileSystem.exists('Default.storage') ) {
 			
 			//_oDatabase.getStorage('entity.Auth').addIndexer('login', new IndexerUniq( new Const(true), new ReflectComparator(!!!) ) )
 			trace('WARNING : generating world');
@@ -102,6 +79,7 @@ class Controller {
 		var a :Array<Dynamic> = [
 			new Signin(this),
 			new Signup(this),
+			new Signout(this),
 			new RetrieveObject(this),
 			new PersistObject(this),
 			new RetrieveIndex(this),
@@ -155,6 +133,7 @@ class Controller {
 			return aResult;
 		}
 		
+		// Case : singular action
 		var oProcedure = _mProcedure.get( oAction.getProcedureName() );
 		
 		if( oProcedure == null )

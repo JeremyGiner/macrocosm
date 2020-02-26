@@ -1,0 +1,17 @@
+
+
+<div class="container">
+	<div class="row">
+		<div class="col">
+		
+			<fieldset>
+				<legend>Buying new asset</legend>
+				:: if request.type == null ::
+					:: render asset_buy_form_1 ::
+				:: else ::
+					:: render asset_buy_form_2 ::
+				:: endif ::
+			</fieldset>
+		</div>
+	</div>
+</div>

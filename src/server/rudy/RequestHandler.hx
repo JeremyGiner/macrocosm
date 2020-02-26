@@ -8,7 +8,10 @@ import rudyhh.Request;
 import rudyhh.RequestReader;
 import rudyhh.Response;
 import server.controller.IAction;
+import entity.mapper.ClientMappingInfoProvider;
 import server.rudy.session.SessionManager;
+import sweet.ribbon.RibbonEncoder;
+import sweet.ribbon.RibbonStrategy;
 import sys.FileStat;
 import sys.FileSystem;
 import sys.net.Socket;
@@ -32,10 +35,13 @@ class RequestHandler implements IRequestHandler {
 	var _oController :Controller;
 	var _oSessionManager :SessionManager<SessionData>;
 	
+	var _oEncoder :RibbonEncoder;
+	
 	public function new() {
 		_oParentThread = Thread.current();
 		_oController = new Controller();
 		_oSessionManager = new SessionManager<SessionData>('temp');
+		_oEncoder = new RibbonEncoder( new RibbonStrategy( new ClientMappingInfoProvider() ) );
 	}
 	
 	public function handle( oClientSocket :Socket ) {//TODO : return child thread or something
@@ -52,10 +58,10 @@ class RequestHandler implements IRequestHandler {
 		trace('redaing done');
 		var oRequest = oReader.createRequest();
 		
-		var oResponse = getResponse( oRequest );
+		var oResponse :Bytes = getResponse( oRequest ).toBytes();
 		
 		//trace( StringTools.urlEncode("HTTP/1.1 404 Not found\r\nContent-Type: text/html\r\nContent-Length: 22\r\n\r\nSysError(Can't read /)"));
-		oClientSocket.output.writeString( oResponse.toString() );
+		oClientSocket.output.writeFullBytes( oResponse, 0, oResponse.length );
 		oClientSocket.output.flush(); // doesn't pause thread as i would expect
 		Sys.sleep(1); // fix flush
 		oClientSocket.close();
@@ -84,7 +90,7 @@ class RequestHandler implements IRequestHandler {
 			var oResponse = new Response();
 			oResponse.setETag( FileSystem.stat( oPath.toString() ).mtime.toString() );
 			oResponse.setContent( 
-				File.getContent( oPath.toString() ), 
+				File.getBytes( oPath.toString() ), 
 				HttpTool.getContentTypeByExt( Path.extension( sUri ) )
 			);
 			return oResponse;
@@ -94,7 +100,7 @@ class RequestHandler implements IRequestHandler {
 		// game action (delegate to Controller)
 		if ( StringTools.startsWith( sUri, '/_game/' ) || sUri == '/_game' ) {
 			if ( oRequest.getBody() == null )
-				return new Response(400, 'Bad request', 'Request has no body');
+				return Response.createSimple(400, 'Bad request', 'Request has no body' );
 			
 			//TODO : turn data into Action
 			var oAction :Action;
@@ -103,20 +109,27 @@ class RequestHandler implements IRequestHandler {
 				oAction = new Action(oData.procedure,ActionType.Alias, cast oData.param);
 			} catch ( e :Dynamic ) {
 				File.saveContent('error.log',CallStack.toString(CallStack.callStack()) + ' - ' + e);
-				return new Response(400, 'Bad request', 'Expected parsable Action fomated in json ');
+				return Response.createSimple(400, 'Bad request', 'Expected parsable Action fomated in json ');
 			}
 			
 			var o = _oController.process( oAction, _oSessionManager );
 			if ( Std.is(o, UserMessage) ) {
-				return new Response(400, 'Bad request', 'user message : '+o.getMessage());
+				return Response.createSimple(400, 'Bad request', 'user message : '+o.getMessage());
 			} else if ( Std.is(o, AccessDenied) ) {
-				return new Response(403, 'Access denied');
+				return Response.createSimple(403, 'Access denied');
 			} else if ( Std.is(o, Error) ) {
 				// TODO : log message
-				return new Response(500, 'Server internal error');
+				return Response.createSimple(500, 'Server internal error');
 			}
-			var oResponse = new Response( 200, 'OK', Json.stringify( o ) );
-			oResponse.setHeader('Content-Type', 'application/json');
+			
+			
+			//WIP
+			var oResponse =  new Response( 200, 'OK');
+			var oBytes = _oEncoder.encode( o );
+			oResponse.setContent( oBytes, 'application/octet-stream' );
+			
+			//var oResponse = new Response( 200, 'OK', Json.stringify( o ) );
+			//oResponse.setHeader('Content-Type', 'application/json');
 			_oSessionManager.processResponse(oResponse);
 			return oResponse;
 		}
@@ -127,7 +140,7 @@ class RequestHandler implements IRequestHandler {
 		var oResponse = new Response();
 		oResponse.setETag( FileSystem.stat( oPath.toString() ).mtime.toString() );
 		oResponse.setContent( 
-			File.getContent( oPath.toString() )
+			File.getBytes( oPath.toString() )
 		);
 		return oResponse;
 		

@@ -15,6 +15,7 @@ import haxe.CallStack;
  typedef DbGetObj = {
 	var storage :String;
 	var id :Dynamic;
+	var partialAr :Array<String>;// list of field to load (TODO : use VPath ?)
 }
  
 class RetrieveObject extends AControllerProcedure<DbGetObj> {
@@ -25,14 +26,20 @@ class RetrieveObject extends AControllerProcedure<DbGetObj> {
 	override public function process( o :DbGetObj ) :Dynamic {
 		
 		// TODO : deny access on Auth
+		trace('ok');
 		var oData = null;
 		try{
 			var oDatabase = _oController.getDatabase();
-			oData = oDatabase.get( o.storage, o.id );//TODO : usee mut get instead
+			oData = oDatabase.get( o.storage, o.id, o.partialAr != null );//TODO : usee mut get instead
+			
+			if( o.partialAr != null )
+				oDatabase.loadPartial( oData, o.partialAr );
+			
 		} catch ( e :Dynamic ) {
 			trace(CallStack.toString(CallStack.exceptionStack()));
 			trace(e);
 		}
+		trace('ok');
 		return oData;
 	}
 	

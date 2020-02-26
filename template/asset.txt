@@ -1,0 +1,19 @@
+
+
+<div class="container">
+	<div class="row">
+		<div class="col">
+		
+			<fieldset>
+				<legend>Asset of :: page.player.label ::</legend>
+				<div>
+				:: for productor in page.productorAr ::
+					<div>
+						:: productor.label :: :: productor.locationAr.0 ::
+					</div>
+				:: endfor ::
+				</div>
+			</fieldset>
+		</div>
+	</div>
+</div>

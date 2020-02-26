@@ -13,6 +13,9 @@ class ProductorType extends Entity {
 	var _iDeedCost :Int;
 	var _oTileCapacityRequirement :TileCapacityRequirement;
 	
+//_________________________________________________________________________
+//	Constructor
+	
 	public function new( 
 		iCategory :Int,//TODO
 		sLabel :String, 
@@ -31,6 +34,17 @@ class ProductorType extends Entity {
 		_oTileCapacityRequirement = oTileCapacityRequirement;
 	}
 	
+//_________________________________________________________________________
+//	Accessor
+	
+	public function getContractCost() {
+		return _iDeedCost;
+	}
+	
+	public function getBaseCost() {
+		return _iValue;
+	}
+
 	public function getProductionType() {
 		return _aProd;
 	}

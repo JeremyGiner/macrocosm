@@ -1,6 +1,6 @@
 <fieldset>
 	<legend>Sign up : </legend>
-	<form id="form_home_signup">
+	<form id="form_signup">
 	<div class="form-group">
 		<label for="exampleInputPassword1">Login</label>
 		<input class="form-control" type="email" name="login" placeholder="email@domain.com">

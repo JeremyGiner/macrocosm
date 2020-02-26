@@ -46,12 +46,19 @@ class Dynasty extends Entity {
 //_________________________________________________________________________
 // Accessor
 
-	public function getLabel() {
-		return _sLabel;
+	public function getCredit() {
+		return _iCredit;
 	}
-
+	
 	public function getLeader() {
 		return _aCharacter[_iLeaderIndex];
+	}
+	public function getCharacterAr() {
+		return _aCharacter;
+	}
+	
+	public function getAvailableContract() {
+		return _iContractCount - _iContractMax;
 	}
 
 //_________________________________________________________________________
@@ -99,6 +106,10 @@ class Dynasty extends Entity {
 //_________________________________________________________________________
 // Modifier
 	
+	public function addCredit( iDelta :Int ) {
+		_iCredit += iDelta; 
+	}
+
 	public function addCharacter( oCharacter :Character ) {
 		_aCharacter.push( oCharacter );
 	}

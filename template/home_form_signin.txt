@@ -1,7 +1,7 @@
 <fieldset>
 	<legend>Sign in : </legend>
 
-	<form id="form_home_signin">
+	<form id="form_signin">
 	<div class="form-group">
 		<label for="exampleInputPassword1">Login</label>
 		<input class="form-control" type="email" name="login" placeholder="email@domain.com">

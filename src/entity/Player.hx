@@ -17,4 +17,8 @@ class Player extends Entity {
 		return _oDynasty;
 	}
 	
+	public function setDynasty( oDynasty :Dynasty ) {
+		_oDynasty = oDynasty;
+	}
+	
 }

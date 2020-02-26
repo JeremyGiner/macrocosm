@@ -18,7 +18,9 @@
 --macro keep('haxe.ds.StringMap')
 
 -lib unveil
+-lib sweet_ribbon
 -cp src
+--resource template/asset.txt@asset
 --resource template/page.txt@page
 --resource template/home.txt@home
 --resource template/home_form_signin.txt@home_form_signin
@@ -27,6 +29,26 @@
 --resource template/worldmap_map.txt@worldmap_map
 --resource template/worldmap.txt@worldmap
 --resource template/debug_ws_action.txt@debug_ws_action
+--resource template/player_create_form.txt@player_create_form
+--resource template/player_create.txt@player_create
+--resource template/navbar.txt@navbar
 
 -main client.Main
 -js bin\_res\main.js
+
+#______________________________________________________________________________
+--next
+
+-cp test
+
+-main Main
+-hl bin/Test.hl
+
+#______________________________________________________________________________
+--next
+
+-cp vendor
+
+-hl bin/profiler.hl
+-main ProfileGen
+-dce no

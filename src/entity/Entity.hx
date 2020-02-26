@@ -4,6 +4,7 @@ package entity;
  * ...
  * @author GINER Jeremy
  */
+@:keepSub
 class Entity {
 
 	var _iId :Null<Int>;
@@ -25,6 +26,10 @@ class Entity {
 	
 	public function setId( iId :Null<Int> ) {
 		_iId = iId;
+	}
+	
+	public function getLabel() {
+		return _sLabel;
 	}
 	
 	
