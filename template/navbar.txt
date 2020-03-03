@@ -18,10 +18,10 @@
 					Worldmap
 				</a>
 			</li>
-			:: if ( user != null ) ::
+			:: if page.user != null ::
 			<li class="nav-item :: if(false) :: active :: endif ::">
 				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					:: user.getEmail ::
+					:: page.user.getEmail ::
 				</a>
 				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
 					<a class="dropdown-item" href="/profile">Profile</a>

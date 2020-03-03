@@ -1,5 +1,6 @@
 package client.controller.process;
 import js.Browser;
+import js.html.TextDecoder;
 import sweet.functor.IFunction;
 import sweet.functor.IProcedure;
 import js.html.FormElement;
@@ -19,18 +20,18 @@ class GameRequest implements IFunction<FormElement,Dynamic> {
 	var _sProcedure :String;
 	var _oPageController :PageController;
 	var _sModelKey :String;
-	var _sPageKey :String;
+	var _sPath :String;
 	
 	public function new( 
 		oPageController :PageController, 
 		sProcedure :String, 
 		sModelKey :String,
-		sPageKey :String
+		sPath :String
 	) {
 		_sProcedure = sProcedure;
 		_oPageController = oPageController;
 		_sModelKey = sModelKey;
-		_sPageKey = sPageKey;
+		_sPath = sPath;
 	}
 	
 	public function apply( oForm :FormElement ) {
@@ -47,9 +48,10 @@ class GameRequest implements IFunction<FormElement,Dynamic> {
 							ResponseBodyRibbon.singleton().apply(oReq) 
 						);
 					
-					_oPageController.gotoRoute(_sPageKey); //TODO: once email confirm implmented, goto waiting email confirm page
+					_oPageController.goto(_sPath); //TODO: once email confirm implmented, goto waiting email confirm page
 				default:
-					Browser.alert(oReq.responseText);
+					var o = new TextDecoder();
+					Browser.alert(o.decode(oReq.response));
 					return;
 			}
 			

@@ -1,8 +1,9 @@
 package server.controller.procedure;
 import entity.Auth;
+import entity.Player;
 import server.controller.Controller.AccessDenied;
 import server.controller.Controller.UserMessage;
-import server.view.EntityViewBuilder;
+import storo.StoroReference;
 
 
 typedef SigninParam = {
@@ -25,16 +26,12 @@ class Signin extends AControllerProcedure<SigninParam> {
 		
 		var oDatabase = getController().getDatabase();
 		oAuth = oDatabase.get( 'entity.Auth', o.login, true );//TODO :load player
-		trace(oDatabase.getStorage('entity.Auth').getDescriptor().getPrimaryIndex());
-		trace(oAuth.getPasswordShadow());
-		trace(Auth.encode(o.password));
-		trace(o.password);
-		trace(oAuth.getPasswordShadow() != Auth.encode(o.password));
+		
 		if( 
 			oAuth == null
 			|| oAuth.getPasswordShadow() != Auth.encode(o.password)
 		)
-			return new AccessDenied(o.login);
+			return new AccessDenied('Invalid login or password');
 		
 		if( oAuth.getPlayer() != null )
 			oDatabase.loadPartial(oAuth,['_oPlayer']);
@@ -42,15 +39,16 @@ class Signin extends AControllerProcedure<SigninParam> {
 		// Store in session
 		// TODO : merge this block with Signin
 		var oData = _oController.getSession().getData();
-		var iPlayerId = (oAuth.getPlayer() != null ? oAuth.getPlayer().getId() : null);
+		var oRef :StoroReference<Auth> = cast oDatabase.createRef( oAuth );
+
 		if ( oData == null )
 			oData = {
 				auth_level: 1, 
-				player_id: iPlayerId,
+				auth: oRef,
 			};
 		else {
 			oData.auth_level = 1;
-			oData.player_id = iPlayerId;
+			oData.auth = oRef;
 		}
 		_oController.getSession().setData( oData );
 		

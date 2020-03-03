@@ -1,5 +1,7 @@
 
 WIP
+	fix bug Eof on server request reading while ctrl+F5 on mozilla
+
 	redirect page to player profile if player is null
 	player creation
 		- using PersistObject to persist player/dynasty/character ?

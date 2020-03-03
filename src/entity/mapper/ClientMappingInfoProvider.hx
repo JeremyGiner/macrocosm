@@ -5,6 +5,7 @@ import entity.*;
 import entity.worldmap.*;
 import entity.part.*;
 import sweet.ribbon.MappingInfo;
+import storo.StoroReference;
 
 /**
  * ...
@@ -14,6 +15,8 @@ class ClientMappingInfoProvider extends MappingInfoProvider {
 
 	public function new() {
 		super();
+		
+		RibbonMacro.setMappingInfo( this, StoroReference );
 		
 		RibbonMacro.setMappingInfo( this, Auth );
 		getByClass(Auth).getFieldNameAr().remove('_sPasswordShadow');

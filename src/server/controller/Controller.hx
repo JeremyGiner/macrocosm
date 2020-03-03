@@ -7,6 +7,7 @@ import server.controller.procedure.InitWorld;
 import server.controller.procedure.PersistObject;
 import server.controller.procedure.RetrieveIndex;
 import server.controller.procedure.RetrieveObject;
+import server.controller.procedure.RetrieveSession;
 import server.controller.procedure.Signin;
 import server.controller.procedure.Signup;
 import server.controller.procedure.Signout;
@@ -19,6 +20,7 @@ import server.rudy.session.SessionManager;
 import server.database.Database;
 import storo.StorageDefault;
 import storo.StorageString;
+import storo.StoroReference;
 import storo.core.IndexerUniq;
 import storo.core.Storage;
 import storo.query.Query;
@@ -28,15 +30,13 @@ import sweet.ribbon.MappingInfoProvider;
 import server.controller.procedure.AControllerProcedure;
 import sweet.ribbon.RibbonMacro;
 import sys.FileSystem;
-
-import server.controller.IAction.ActionType;
 import sys.net.Host;
 import entity.*;
 import entity.worldmap.*;
 
 typedef SessionData = {
 	var auth_level :Int; // TODO : 
-	var player_id :Int;
+	var auth :StoroReference<Auth>;
 }
 
 /**
@@ -83,6 +83,7 @@ class Controller {
 			new RetrieveObject(this),
 			new PersistObject(this),
 			new RetrieveIndex(this),
+			new RetrieveSession(this),
 		];
 		for( o in a )
 			_mProcedure.set(o.getId(), o);
@@ -126,7 +127,7 @@ class Controller {
 			for ( oData in aAction ) {
 				aResult.push( 
 					process( new Action(
-						oData.procedure, ActionType.Alias, cast oData.param//TODO : use a factory
+						oData.procedure, cast oData.param//TODO : use a factory
 					) )
 				);
 			}
@@ -164,20 +165,20 @@ class Controller {
 		//process( new Action(Get,DB,{storage:'entity.Player',id:3}) );
 	}
 	
-	public function auth_action_access_check( oAction :IAction ) {
-		switch( oAction.getType() ) {
-			
-			case Login,Composite,Alias: return true;
-			case RetrieveObject:
-				
-			case PersistObject: 
-				
-			default: 
-				return false;
-		}
-		
-		return true;
-	}
+	//public function auth_action_access_check( oAction :IAction ) {
+		//switch( oAction.getType() ) {
+			//
+			//case Login,Composite,Alias: return true;
+			//case RetrieveObject:
+				//
+			//case PersistObject: 
+				//
+			//default: 
+				//return false;
+		//}
+		//
+		//return true;
+	//}
 }
 
 class Message {

@@ -20,7 +20,6 @@ import sys.io.File;
 import rudyhh.tool.HttpTool;
 import server.controller.Action;
 import server.controller.Controller.AccessDenied;
-import server.controller.IAction.ActionType;
 import server.controller.Controller.SessionData;
 import server.controller.Controller;
 
@@ -61,9 +60,9 @@ class RequestHandler implements IRequestHandler {
 		var oResponse :Bytes = getResponse( oRequest ).toBytes();
 		
 		//trace( StringTools.urlEncode("HTTP/1.1 404 Not found\r\nContent-Type: text/html\r\nContent-Length: 22\r\n\r\nSysError(Can't read /)"));
-		oClientSocket.output.writeFullBytes( oResponse, 0, oResponse.length );
+		oClientSocket.output.write( oResponse );
 		oClientSocket.output.flush(); // doesn't pause thread as i would expect
-		Sys.sleep(1); // fix flush
+		Sys.sleep(1); // fix flush, doesn't work TODO fix
 		oClientSocket.close();
 	}
 	
@@ -106,7 +105,7 @@ class RequestHandler implements IRequestHandler {
 			var oAction :Action;
 			try {
 				var oData = oRequest.getBody();
-				oAction = new Action(oData.procedure,ActionType.Alias, cast oData.param);
+				oAction = new Action(oData.procedure, cast oData.param);
 			} catch ( e :Dynamic ) {
 				File.saveContent('error.log',CallStack.toString(CallStack.callStack()) + ' - ' + e);
 				return Response.createSimple(400, 'Bad request', 'Expected parsable Action fomated in json ');
@@ -116,7 +115,7 @@ class RequestHandler implements IRequestHandler {
 			if ( Std.is(o, UserMessage) ) {
 				return Response.createSimple(400, 'Bad request', 'user message : '+o.getMessage());
 			} else if ( Std.is(o, AccessDenied) ) {
-				return Response.createSimple(403, 'Access denied');
+				return Response.createSimple(403, 'Access denied', o.getMessage() );
 			} else if ( Std.is(o, Error) ) {
 				// TODO : log message
 				return Response.createSimple(500, 'Server internal error');

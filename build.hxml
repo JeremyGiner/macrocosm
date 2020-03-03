@@ -17,6 +17,7 @@
 --macro keep('haxe.ds.IntMap')
 --macro keep('haxe.ds.StringMap')
 
+-lib storo
 -lib unveil
 -lib sweet_ribbon
 -cp src

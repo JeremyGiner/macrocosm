@@ -1,7 +1,9 @@
 package server.controller.procedure;
 import entity.Auth;
+import entity.Player;
 import server.controller.Controller.UserMessage;
 import sweet.functor.builder.FactoryDefault;
+import storo.StoroReference;
 
 typedef SignupParam = {
 	var login :String;
@@ -39,15 +41,16 @@ class Signup extends AControllerProcedure<SignupParam> {
 		// Store in session
 		// TODO : merge this block with Signup
 		var oData = _oController.getSession().getData();
-		var iPlayerId = (oAuth.getPlayer() != null ? oAuth.getPlayer().getId() : null);
+		var oRef :StoroReference<Auth> = cast oDatabase.createRef( oAuth );
+
 		if ( oData == null )
 			oData = {
 				auth_level: 1, 
-				player_id: iPlayerId,
+				auth: oRef,
 			};
 		else {
 			oData.auth_level = 1;
-			oData.player_id = iPlayerId;
+			oData.auth = oRef;
 		}
 		_oController.getSession().setData( oData );
 		
