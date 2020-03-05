@@ -48,6 +48,7 @@ class Main {
 				param: null,
 			}, new ResponseBodyRibbon(), XMLHttpRequestResponseType.ARRAYBUFFER),
 			'user' => new StoroRefLoader( oModel, 'session', new VPathAccessor('auth') ),
+			'player' => new StoroRefLoader( oModel, 'user', new VPathAccessor('_oPlayer') ),
 			'prodtype_ar' => new LoaderXhrJson('POST', '/_game', [], {
 				procedure: "server.controller.procedure.RetrieveObject", 
 				param: {
@@ -95,43 +96,43 @@ class Main {
 					content: 'page content',
 					array: ['item0','item1'],
 				},
-				model_load: ['user'],
+				model_load: ['user','player'],
 			},
 			{
 				id: 'player',
 				path_pattern: new RegExp('\\/player'),
 				page_data: null,
-				model_load: ['user'],
+				model_load: ['user','player'],
 			},
 			{
 				id: 'worldmap',
 				path_pattern: new RegExp('\\/worldmap'),
 				page_data: null,
-				model_load: ['user','worldmap'],
+				model_load: ['user','player','worldmap'],
 			},
 			{
 				id: 'asset',
 				path_pattern: new RegExp('\\/asset'),
 				page_data: null,
-				model_load: ['user'],
+				model_load: ['user','player'],
 			},
 			{
 				id: 'debug',
 				path_pattern: new RegExp('\\/debug'),
 				page_data: null,
-				model_load: ['user'],
+				model_load: ['user','player'],
 			},
 			{
 				id: 'asset_buy',
 				path_pattern: new RegExp('\\/buy(\\/\\d+)?'),
 				page_data: null,
-				model_load: ['user'],
+				model_load: ['user','player'],
 			},
 			{
 				id: 'not_found',
 				path_pattern: new RegExp('\\/not-found'),
 				page_data: null,
-				model_load: ['user'],
+				model_load: ['user','player'],
 			},
 			
 		];
@@ -144,6 +145,7 @@ class Main {
 			'form_signout' => new GameRequest( oPageController,'server.controller.procedure.Signout',null,'/'),
 			'form_signin' => new GameRequest( oPageController,'server.controller.procedure.Signin','user','/'),
 			'form_signup' => new GameRequest( oPageController,'server.controller.procedure.Signup','user','/'),
+			'form_player_create' => new GameRequest( oPageController,'server.controller.procedure.CreatePlayer','player','/'),
 		]);
 
 	}

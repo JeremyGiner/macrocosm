@@ -37,6 +37,7 @@ class Dynasty extends Entity {
 		_iCredit = 100;
 		_iContractMax = 3;
 		
+		_aCharacter = new Array<Character>();
 		_mIncomeFlow = new IntMap<IncomeFlow>();
 		_iContractCount = 0;
 		_iIncome = 0;

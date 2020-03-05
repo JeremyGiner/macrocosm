@@ -53,9 +53,18 @@ class RequestHandler implements IRequestHandler {
 		
 		// Read request
 		var oReader = new RequestReader( oClientSocket.input );
-		while (oReader.read() != State.Done ){}
-		trace('redaing done');
+		try {
+			while (oReader.read() != State.Done ){}
+		} catch ( e :Dynamic ) {
+			var o = new Response(400, 'Unreadable'); // TODO: cache response?
+			trace('WARNING : unreadable request');
+			oClientSocket.output.write( o.toBytes() );
+			oClientSocket.output.flush();
+			oClientSocket.close();
+			return;
+		}
 		var oRequest = oReader.createRequest();
+		trace('dispaching request : "'+ oRequest.getUri()+'"');
 		
 		var oResponse :Bytes = getResponse( oRequest ).toBytes();
 		
@@ -92,6 +101,7 @@ class RequestHandler implements IRequestHandler {
 				File.getBytes( oPath.toString() ), 
 				HttpTool.getContentTypeByExt( Path.extension( sUri ) )
 			);
+			trace('NOTICE : dispaching file content : "'+oPath.toString()+'"');
 			return oResponse;
 		}
 		

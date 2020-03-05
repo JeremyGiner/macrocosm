@@ -65,12 +65,13 @@ class Controller {
 		
 		
 		// World generation
-		if ( !FileSystem.exists('Default.storage') ) {
+		if ( FileSystem.stat('Default.storage').size == 0 ) {
 			
 			//_oDatabase.getStorage('entity.Auth').addIndexer('login', new IndexerUniq( new Const(true), new ReflectComparator(!!!) ) )
 			trace('WARNING : generating world');
 			var o = new InitWorld( this );
 			o.process(null);
+			trace('WARNING : generating world DONE');
 		}
 		
 		

@@ -33,8 +33,8 @@ class Signin extends AControllerProcedure<SigninParam> {
 		)
 			return new AccessDenied('Invalid login or password');
 		
-		if( oAuth.getPlayer() != null )
-			oDatabase.loadPartial(oAuth,['_oPlayer']);
+		//if( oAuth.getPlayer() != null )
+			//oDatabase.loadPartial(oAuth,['_oPlayer']);
 		
 		// Store in session
 		// TODO : merge this block with Signin
