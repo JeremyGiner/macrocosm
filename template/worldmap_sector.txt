@@ -4,7 +4,7 @@
 	:: for row in sector.locationAr ::
 	<tr>
 		:: for sector_location in row ::
-		<td class="">
+		<td class="" style="background-color: #::sector_location.color::">
 			:: if sector_location.city != null ::
 			<div class="map-cell sprite sprite-city" 
 				style="background-color: rgba( 128, 128, 128)"

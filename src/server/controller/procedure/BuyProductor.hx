@@ -8,7 +8,7 @@ import entity.ProductorType;
 import entity.Location;
 
 typedef BuyProductorParam = {
-	var entity_path :String;
+	var type_id :Int;
 	var param :Array<Dynamic>;
 	var locationAr :Array<String>;
 }
@@ -22,6 +22,10 @@ class BuyProductor extends AControllerProcedure<BuyProductorParam> {
 	
 	override public function process( o :BuyProductorParam ) :Dynamic {
 		
+		if ( !checkAccess() )
+			return new AccessDenied('Require authentification');
+		
+		
 		// Get location array 
 		var aLocation = o.locationAr.map(function( s :String ) {
 			return Location.fromString( s );
@@ -33,12 +37,12 @@ class BuyProductor extends AControllerProcedure<BuyProductorParam> {
 		// Get player
 		var iPlayerId = _oController.getSession().getData().player_id;
 		if ( iPlayerId == null ) 
-			return new AccessDenied('Require authentification');
+			return new AccessDenied('');
 		var oPlayer :Player = oDatabase.mustGet('Default', iPlayerId);
 		
 		// Get productor type
-		var oProductorType :ProductorType = cast oDatabase.get(Type.getClassName(ProductorType), );
-		if ( oProductorType == null ) 
+		var oProductorType :ProductorType = cast oDatabase.get('Default', o.type_id );
+		if ( oProductorType == null || !Std.is(oProductorType,ProductorType) ) 
 			return new UserMessage('Invalid productor type id : #'+);
 		
 		// Check player credit/contract
@@ -57,5 +61,18 @@ class BuyProductor extends AControllerProcedure<BuyProductorParam> {
 		oDatabase.persist( o );
 		oDatabase.flush();
 		return o;
+	}
+	
+	
+	public function checkAccess() {
+		var oSessionData = _oController.getSession().getData();
+		if ( oSessionData == null )
+			return false;
+		
+		//TODO : check session.auth != null
+		if ( oSessionData.auth_level < 1 )
+			return false;
+		
+		return true;
 	}
 }

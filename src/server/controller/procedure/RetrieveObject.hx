@@ -26,7 +26,6 @@ class RetrieveObject extends AControllerProcedure<DbGetObj> {
 	override public function process( o :DbGetObj ) :Dynamic {
 		
 		// TODO : deny access on Auth
-		trace('ok');
 		var oData = null;
 		try{
 			var oDatabase = _oController.getDatabase();
@@ -39,7 +38,6 @@ class RetrieveObject extends AControllerProcedure<DbGetObj> {
 			trace(CallStack.toString(CallStack.exceptionStack()));
 			trace(e);
 		}
-		trace('ok');
 		return oData;
 	}
 	

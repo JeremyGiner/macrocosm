@@ -2,7 +2,6 @@ package server.controller.procedure;
 import entity.Auth;
 import server.controller.Controller.AccessDenied;
 import server.controller.Controller.UserMessage;
-import server.view.EntityViewBuilder;
 
 
 
