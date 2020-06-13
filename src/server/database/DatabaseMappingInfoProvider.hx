@@ -5,6 +5,7 @@ import entity.*;
 import entity.worldmap.*;
 import entity.part.*;
 import sweet.ribbon.MappingInfo;
+import entity.Character.CharacterBody;
 
 /**
  * ...
@@ -27,6 +28,11 @@ class DatabaseMappingInfoProvider extends MappingInfoProvider {
 		RibbonMacro.setMappingInfo( this, ProductorType );
 		RibbonMacro.setMappingInfo( this, Worldmap );
 		RibbonMacro.setMappingInfo( this, Sector );
+		RibbonMacro.setMappingInfo( this, Player );
+		RibbonMacro.setMappingInfo( this, Dynasty );
+		RibbonMacro.setMappingInfo( this, Location );
+		RibbonMacro.setMappingInfo( this, Character );
+		RibbonMacro.setMappingInfo( this, CharacterBody );
 	}
 	
 }

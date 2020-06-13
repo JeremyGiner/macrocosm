@@ -1,8 +1,12 @@
 package server.database;
 import haxe.io.Path;
+import storo.StorageDefault;
 import storo.StorageString;
 import storo.core.Database in BaseDatabase;
 import entity.Auth;
+import storo.indexer.ForeignIdIndexer;
+import storo.tool.VPathAccessor;
+import sweet.functor.comparator.IntAscComparator;
 
 /**
  * ...
@@ -15,7 +19,7 @@ class Database extends BaseDatabase {
 		
 		super( new DatabaseMappingInfoProvider() );
 		
-		this.setStorage('entity.Auth', new StorageString<Auth>(
+		setStorage(new StorageString<Auth>(
 			this,
 			'entity.Auth',
 			new Path('Auth.storage'),
@@ -23,6 +27,19 @@ class Database extends BaseDatabase {
 			this.getDefaultDecoder(),
 			new AuthEntityKeyProvider()
 		) );
+		
+		var o = new StorageDefault(
+			this,
+			'entity.Productor',
+			new Path('Productor.storage'),
+			this.getDefaultEncoder(),
+			this.getDefaultDecoder()
+		);
+		o.addIndexer('by_owner', new ForeignIdIndexer<Int,Int>(
+			new VPathAccessor('_oOwner'),
+			new IntAscComparator()
+		) );
+		setStorage(o);
 	}
 	
 	override public function getStorageByObject( o :Dynamic ) {
@@ -32,7 +49,7 @@ class Database extends BaseDatabase {
 		
 		var sClassName = Type.getClassName( oClass );
 		switch( sClassName ) {
-			case 'entity.Auth': return getStorage(sClassName);
+			case 'entity.Auth','entity.Productor': return getStorage(sClassName);
 		}
 		
 		return super.getStorageByObject( o );

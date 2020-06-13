@@ -7,7 +7,7 @@
 			<fieldset>
 				<legend>Asset of :: page.player.label ::</legend>
 				<div>
-				:: for productor in page.productorAr ::
+				:: for productor in page.productor_ar ::
 					<div>
 						:: productor.label :: :: productor.locationAr.0 ::
 					</div>

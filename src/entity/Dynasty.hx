@@ -1,6 +1,5 @@
 package entity;
 import haxe.ds.IntMap;
-import haxe.ds.ListSort;
 
 using Lambda;
 
@@ -17,6 +16,7 @@ class Dynasty extends Entity {
 	var _iLeaderIndex :Int; // Head of the dynasty
 	
 	var _aCharacter :Array<Character>; // List of followers
+	var _aProductor :Array<Productor>;
 	
 	
 	// ? house (the building)
@@ -24,9 +24,7 @@ class Dynasty extends Entity {
 	//__________________
 	// Calculated
 	
-	var _mIncomeFlow :IntMap<IncomeFlow>;
 	var _iContractCount :Int;
-	var _iIncome :Int;
 	
 //_________________________________________________________________________
 // Constructor
@@ -38,10 +36,9 @@ class Dynasty extends Entity {
 		_iContractMax = 3;
 		
 		_aCharacter = new Array<Character>();
-		_mIncomeFlow = new IntMap<IncomeFlow>();
+		_aProductor = new Array<Productor>();
+		
 		_iContractCount = 0;
-		_iIncome = 0;
-		throw 'TODO';
 	}
 	
 //_________________________________________________________________________
@@ -131,19 +128,19 @@ class Dynasty extends Entity {
 		//incomeUpdate();
 	//}
 	
-	public function removeIncomeFlow( iId :Int  ) {
-		
-		var oCharge = _mIncomeFlow.get( iId );
-		
-		if ( oCharge == null )
-			throw 'cannot remove charge #'+iId;
-		
-		if ( oCharge.getCount() == 1 ) 
-			_mIncomeFlow.remove( iId );
-		oCharge.decrement();
-		
-		incomeUpdate();
-	}
+	//public function removeIncomeFlow( iId :Int  ) {
+		//
+		//var oCharge = _mIncomeFlow.get( iId );
+		//
+		//if ( oCharge == null )
+			//throw 'cannot remove charge #'+iId;
+		//
+		//if ( oCharge.getCount() == 1 ) 
+			//_mIncomeFlow.remove( iId );
+		//oCharge.decrement();
+		//
+		//incomeUpdate();
+	//}
 	
 	/**
 	 * update on : 
@@ -168,12 +165,12 @@ LEFT JOIN (
 	 *  update on : 
 	 *  - 
 	 */
-	public function incomeUpdate() {
-		
-		_iIncome = 0;
-		for ( o in _mIncomeFlow )
-			_iIncome += o.getType().getValue();
-	}
+	//public function incomeUpdate() {
+		//
+		//_iIncome = 0;
+		//for ( o in _mIncomeFlow )
+			//_iIncome += o.getType().getValue();
+	//}
 }
 
 

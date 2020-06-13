@@ -25,7 +25,7 @@ class Signin extends AControllerProcedure<SigninParam> {
 			return new UserMessage('Invalid field login');
 		
 		var oDatabase = getController().getDatabase();
-		oAuth = oDatabase.get( 'entity.Auth', o.login, true );//TODO :load player
+		oAuth = oDatabase.get( 'entity.Auth', o.login, true );
 		
 		if( 
 			oAuth == null
@@ -33,11 +33,8 @@ class Signin extends AControllerProcedure<SigninParam> {
 		)
 			return new AccessDenied('Invalid login or password');
 		
-		//if( oAuth.getPlayer() != null )
-			//oDatabase.loadPartial(oAuth,['_oPlayer']);
-		
 		// Store in session
-		// TODO : merge this block with Signin
+		// TODO : merge this block with Signup
 		var oData = _oController.getSession().getData();
 		var oRef :StoroReference<Auth> = cast oDatabase.createRef( oAuth );
 

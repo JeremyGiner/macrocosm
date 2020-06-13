@@ -3,6 +3,8 @@ import logger.Logger;
 import haxe.CallStack;
 import haxe.io.Path;
 import haxe.ds.StringMap;
+import server.controller.procedure.BuyProductor;
+import server.controller.procedure.CreatePlayer;
 import server.controller.procedure.InitWorld;
 import server.controller.procedure.PersistObject;
 import server.controller.procedure.RetrieveIndex;
@@ -21,7 +23,6 @@ import server.database.Database;
 import storo.StorageDefault;
 import storo.StorageString;
 import storo.StoroReference;
-import storo.core.IndexerUniq;
 import storo.core.Storage;
 import storo.query.Query;
 import sweet.functor.comparator.ReflectComparator;
@@ -62,8 +63,6 @@ class Controller {
 		
 		_oDatabase = new Database();
 		
-		
-		
 		// World generation
 		if ( FileSystem.stat('Default.storage').size == 0 ) {
 			
@@ -81,10 +80,14 @@ class Controller {
 			new Signin(this),
 			new Signup(this),
 			new Signout(this),
+			
 			new RetrieveObject(this),
 			new PersistObject(this),
 			new RetrieveIndex(this),
 			new RetrieveSession(this),
+			
+			new BuyProductor(this),
+			new CreatePlayer(this),
 		];
 		for( o in a )
 			_mProcedure.set(o.getId(), o);
@@ -199,7 +202,14 @@ class UserMessage extends Message {
 }
 
 class Error extends Message {
-	
+	var _oCallstack :String;
+	public function new( sMessage :String  ) {
+		super(sMessage);
+		_oCallstack = CallStack.toString(CallStack.callStack());
+	}
+	public function getCallstack() {
+		return _oCallstack;
+	}
 }
 
 class AccessDenied extends Message {

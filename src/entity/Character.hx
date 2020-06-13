@@ -77,28 +77,28 @@ class CharacterBody {
 	}
 }
 
-class CharacterHistory {
-	var _oType :CharacterHistoryType;
-	var _oDate :InGameDate;
-	
-	
-}
+//class CharacterHistory {
+	//var _oType :CharacterHistoryType;
+	//var _oDate :InGameDate;
+	//
+	//
+//}
+//
+//enum CharacterHistoryType {
+	//Wedding;
+	//ChildBirth;
+	//JobUpdate;
+	//Death;
+//}
 
-enum CharacterHistoryType {
-	Wedding;
-	ChildBirth;
-	JobUpdate;
-	Death;
-}
-
-enum Motivation {
-	SelfPreservation;
-	RaiseChild;
-	CreateMasterPiece;
+enum abstract Motivation(String) {
+	var SelfPreservation;
+	var RaiseChild;
+	var CreateMasterPiece;
 	// TODO : more
 	// Care for X / self
 }
-enum Sex {
-	Male;
-	Female;
+enum abstract Sex(Int) {
+	var Male;
+	var Female;
 }

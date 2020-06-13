@@ -35,7 +35,7 @@ class BuyProductor extends AControllerProcedure<BuyProductorParam> {
 		var oDatabase = _oController.getDatabase();
 		
 		// Get player
-		var iPlayerId = _oController.getSession().getData().player_id;
+		var iPlayerId = _oController.getSession().getData().auth.getEntityId();
 		if ( iPlayerId == null ) 
 			return new AccessDenied('');
 		var oPlayer :Player = oDatabase.mustGet('Default', iPlayerId);
@@ -43,7 +43,7 @@ class BuyProductor extends AControllerProcedure<BuyProductorParam> {
 		// Get productor type
 		var oProductorType :ProductorType = cast oDatabase.get('Default', o.type_id );
 		if ( oProductorType == null || !Std.is(oProductorType,ProductorType) ) 
-			return new UserMessage('Invalid productor type id : #'+);
+			return new UserMessage('Invalid productor type id : #'+o.type_id);
 		
 		// Check player credit/contract
 		var iCredit = oPlayer.getDynasty().getCredit();
@@ -59,7 +59,7 @@ class BuyProductor extends AControllerProcedure<BuyProductorParam> {
 		var o = new Productor('', oPlayer.getDynasty(), aLocation, oProductorType );
 		//var o = new FactoryDefault(Type.resolveClass( o.entity_path ), o.param).create();
 		oDatabase.persist( o );
-		oDatabase.flush();
+		oDatabase.flush();// TODO : rollback flush in case error
 		return o;
 	}
 	

@@ -26,6 +26,7 @@ import js.html.XMLHttpRequestResponseType;
  * ...
  * @author 
  */
+@:build(unveil.tool.Macro.buildTemplate('template'))
 class Main {
 
 	static public function main() {
@@ -50,11 +51,10 @@ class Main {
 			'user' => new StoroRefLoader( oModel, 'session', new VPathAccessor('auth') ),
 			'player' => new StoroRefLoader( oModel, 'user', new VPathAccessor('_oPlayer') ),
 			'prodtype_ar' => new LoaderXhrJson('POST', '/_game', [], {
-				procedure: "server.controller.procedure.RetrieveObject", 
+				procedure: "server.controller.procedure.RetrieveObjectArray", 
 				param: {
-					storage: '',
-					id: -1,
-					partialAr: null,
+					keyAr: [],
+					index_chain: untyped [[10/* TODO: insert dynasty_id */],'entity.Productor#by_owner'],
 				},
 			}, new ResponseBodyRibbon(), XMLHttpRequestResponseType.ARRAYBUFFER),
 		];
@@ -78,7 +78,7 @@ class Main {
 			{key: 'asset', template: Resource.getString('asset')},
 			{key: 'debug', template: Resource.getString('debug_ws_action')},
 			{key: 'player_create_form', template: Resource.getString('player_create_form')},
-			{key: 'player_create', template: Resource.getString('player_create')},
+			{key: 'player', template: Resource.getString('player')},
 		];
 		for ( oItem in aTemplate ) {
 			oView.addTemplate( oItem.key, oCompiler.compile(oItem.template) );
@@ -114,7 +114,7 @@ class Main {
 				id: 'asset',
 				path_pattern: new RegExp('\\/asset'),
 				page_data: null,
-				model_load: ['user','player'],
+				model_load: ['user','player','prodtype_ar'],
 			},
 			{
 				id: 'debug',

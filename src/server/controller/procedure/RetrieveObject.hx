@@ -20,9 +20,6 @@ import haxe.CallStack;
  
 class RetrieveObject extends AControllerProcedure<DbGetObj> {
 	
-	static public var toto :Sector = null;
-	static public var titi :StringMap<Sector> = null;
-	
 	override public function process( o :DbGetObj ) :Dynamic {
 		
 		// TODO : deny access on Auth
