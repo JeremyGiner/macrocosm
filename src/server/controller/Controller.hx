@@ -3,16 +3,7 @@ import logger.Logger;
 import haxe.CallStack;
 import haxe.io.Path;
 import haxe.ds.StringMap;
-import server.controller.procedure.BuyProductor;
-import server.controller.procedure.CreatePlayer;
-import server.controller.procedure.InitWorld;
-import server.controller.procedure.PersistObject;
-import server.controller.procedure.RetrieveIndex;
-import server.controller.procedure.RetrieveObject;
-import server.controller.procedure.RetrieveSession;
-import server.controller.procedure.Signin;
-import server.controller.procedure.Signup;
-import server.controller.procedure.Signout;
+
 import server.database.AuthEntityKeyProvider;
 import entity.mapper.ClientMappingInfoProvider;
 import server.database.DatabaseMappingInfoProvider;
@@ -34,6 +25,7 @@ import sys.FileSystem;
 import sys.net.Host;
 import entity.*;
 import entity.worldmap.*;
+import server.controller.procedure.*;
 
 typedef SessionData = {
 	var auth_level :Int; // TODO : 
@@ -85,6 +77,8 @@ class Controller {
 			new PersistObject(this),
 			new RetrieveIndex(this),
 			new RetrieveSession(this),
+			new RetrieveStorageKeyList(this),
+			new RetrieveStorageObjectPage(this),
 			
 			new BuyProductor(this),
 			new CreatePlayer(this),
@@ -141,15 +135,18 @@ class Controller {
 		// Case : singular action
 		var oProcedure = _mProcedure.get( oAction.getProcedureName() );
 		
+		// Case : not found
 		if( oProcedure == null )
-			return new UserMessage(oAction.getProcedureName()+' not found');
+			return new UserMessage(oAction.getProcedureName() + ' not found');
+		
+		// Process
 		try {
 			// TODO : validate param
 			return oProcedure.process( cast oAction.getParam() );
 		} catch( e :UserMessage ) {
 			return e;
 		} catch ( e :Dynamic ) {
-			Logger.log('\nError: '+ e + CallStack.toString(CallStack.exceptionStack()) );
+			Logger.logError( e + CallStack.toString(CallStack.exceptionStack()) );
 			return new Error('Server internal error : '+e);
 		}
 	}

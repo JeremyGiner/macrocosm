@@ -3,12 +3,14 @@ import client.controller.process.GameRequest;
 import client.view.WorldmapViewBuilder;
 import haxe.Json;
 import haxe.ds.StringMap;
+import haxe.macro.Expr.Catch;
 import js.Browser;
 import js.html.Element;
 import js.html.Event;
 import js.html.XMLHttpRequest;
 import js.lib.RegExp;
 import client.response_body_decoder.ResponseBodyRibbon;
+import sweet.functor.builder.FactoryCloner;
 import unveil.tool.VPathAccessor;
 import unveil.controller.FormController;
 import unveil.template.Compiler;
@@ -36,27 +38,33 @@ class Main {
 		var oModel = new Model();
 		
 		var mModelConfig = [
-			'worldmap' => new LoaderXhrJson('POST', '/_game', [], {
+			'worldmap' => new LoaderXhrJson('POST', '/_game', [], new FactoryCloner({
 				procedure: "server.controller.procedure.RetrieveObject", 
 				param: {
 					storage: 'Default',
 					id: -1,
 					partialAr: null,
 				},
-			}, new WorldmapViewBuilder(), XMLHttpRequestResponseType.ARRAYBUFFER),
-			'session' => new LoaderXhrJson('POST', '/_game', [], {
-				procedure: "server.controller.procedure.RetrieveSession", 
-				param: null,
-			}, new ResponseBodyRibbon(), XMLHttpRequestResponseType.ARRAYBUFFER),
+			}), new WorldmapViewBuilder(), XMLHttpRequestResponseType.ARRAYBUFFER),
+			'session' => new GameProcedureLoader("RetrieveSession", null),
 			'user' => new StoroRefLoader( oModel, 'session', new VPathAccessor('auth') ),
 			'player' => new StoroRefLoader( oModel, 'user', new VPathAccessor('_oPlayer') ),
-			'prodtype_ar' => new LoaderXhrJson('POST', '/_game', [], {
-				procedure: "server.controller.procedure.RetrieveObjectArray", 
-				param: {
-					keyAr: [],
-					index_chain: untyped [[10/* TODO: insert dynasty_id */],'entity.Productor#by_owner'],
-				},
-			}, new ResponseBodyRibbon(), XMLHttpRequestResponseType.ARRAYBUFFER),
+			'prodtype_ar' => new GameProcedureLoader("RetrieveObjectArray", {
+				keyAr: [],
+				index_chain: untyped [
+					[10/* TODO: insert dynasty_id */],
+					'entity.Productor#by_owner'
+				],
+			}),
+			
+			
+			// Admin
+			'storage_key_list' => new GameProcedureLoader("RetrieveStorageKeyList", null),
+			'entity_page' => new GameProcedureLoader("RetrieveStorageEntityPage", {
+				storage: 'Default',
+				page: 1,
+				count: 20,
+			}),
 		];
 		for ( s => o in mModelConfig )
 			oModel.setEntity( s, o );
@@ -79,6 +87,7 @@ class Main {
 			{key: 'debug', template: Resource.getString('debug_ws_action')},
 			{key: 'player_create_form', template: Resource.getString('player_create_form')},
 			{key: 'player', template: Resource.getString('player')},
+			{key: 'admin', template: Resource.getString('admin')},
 		];
 		for ( oItem in aTemplate ) {
 			oView.addTemplate( oItem.key, oCompiler.compile(oItem.template) );
@@ -87,7 +96,7 @@ class Main {
 		//__________________
 		// Page Controller
 		var oPageController = new PageController( oModel, oView );
-		var mPageHandle = [
+		var mPageHandle :Array<PageHandle> = [
 			{
 				id: 'home',
 				path_pattern: new RegExp('\\/'),
@@ -128,6 +137,21 @@ class Main {
 				page_data: null,
 				model_load: ['user','player'],
 			},
+			
+			{
+				id: 'semanet',
+				path_pattern: new RegExp('\\/semanet(\\/\\d+)?'),
+				page_data: null,
+				model_load: ['semanet'],
+			},
+			
+			{
+				id: 'admin',
+				path_pattern: new RegExp('\\/admin(\\/\\s+)?'),
+				page_data: {storage_current: null,},
+				model_load: ['storage_key_list'],
+			},
+			
 			{
 				id: 'not_found',
 				path_pattern: new RegExp('\\/not-found'),
@@ -137,8 +161,11 @@ class Main {
 			
 		];
 		for ( o in mPageHandle ) oPageController.addPageHandler(o);
-		oPageController.goto( Browser.location.pathname );
-		
+		try {
+			oPageController.goto( Browser.location.pathname );
+		} catch( e :Dynamic ) {
+			trace( e );
+		}
 		//__________________
 		// Form Controller
 		new FormController( [
@@ -150,4 +177,14 @@ class Main {
 
 	}
 	
+}
+
+class GameProcedureLoader extends LoaderXhrJson {
+	
+	public function new( procedure :String, oParam :Dynamic ) {
+		super('POST', '/_game', [], new FactoryCloner({
+			procedure: "server.controller.procedure."+procedure, 
+			param: oParam,
+		}), new ResponseBodyRibbon(), XMLHttpRequestResponseType.ARRAYBUFFER);
+	}
 }

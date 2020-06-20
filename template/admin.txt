@@ -1,0 +1,33 @@
+::render(navbar)::
+<div class="container">
+	<div class="row">
+		<div class="col-auto">
+			<ul>
+			:: for storage in page.storage_key_list ::
+				<li><a href="storage/:: storage ::">:: storage ::</a>
+			:: endfor ::
+			</ul>
+		</div>
+		<div class="col">
+			:: if page.storage_current == null ::
+				<p class="muted">No storage selected</p>
+			:: else ::
+			<div class="row">
+			:: for object in storage_current.page ::
+				<div class="col">
+					<div class="row">
+					<div class="col">
+						:: object.type.label ::
+					</div>
+					<div class="col-auto">
+						:: object.key ::
+					</div>
+					</div>
+				</div>
+			:: endfor ::
+			</div>
+			</table>
+			:: endif ::
+		</div>
+	</div>
+</div>

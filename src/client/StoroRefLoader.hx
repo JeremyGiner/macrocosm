@@ -1,4 +1,5 @@
 package client;
+import sweet.functor.builder.FactoryCloner;
 import unveil.Model;
 import unveil.loader.LoaderXhrJson;
 import unveil.tool.VPathAccessor;
@@ -25,7 +26,7 @@ class StoroRefLoader extends LoaderXhrJson {
 		_oModel = oModel;
 		_sParentKey = sParentKey;
 		_oVPath = oVPath;
-		super('POST','/_game',[],{},new ResponseBodyRibbon(),XMLHttpRequestResponseType.ARRAYBUFFER);
+		super('POST','/_game',[],null,new ResponseBodyRibbon(),XMLHttpRequestResponseType.ARRAYBUFFER);
 	}
 	
 	override public function callback(resolve:String->Void, reject:Dynamic->Void) {
@@ -49,7 +50,7 @@ class StoroRefLoader extends LoaderXhrJson {
 				return;
 			}
 			
-			_sBody = Json.stringify( {
+			_oBodyFactory = new FactoryCloner( {
 				procedure: "server.controller.procedure.RetrieveObject",
 				param: {
 					id: oRef.getEntityId(), 

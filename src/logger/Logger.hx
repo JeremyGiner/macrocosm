@@ -13,4 +13,9 @@ class Logger {
 		File.append( path ).writeString( s );
 	}
 	
+	static public function logError( s :String ) {
+		trace('An error have been log to "'+path+'"');
+		File.append( path ).writeString( '\nError: '+s );
+	}
+	
 }
