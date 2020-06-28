@@ -1,6 +1,8 @@
 
 WIP
+	 fix bug loader crash, entity corrupted with pending Promise
 	fix bug Eof on server request reading while ctrl+F5 on mozilla
+		done?
 
 	redirect page to player profile if player is null
 	player creation
@@ -39,6 +41,16 @@ FUTURE
 		- transport easier on small object like jewelry
 		- add intellectual work
 		? add skill level requirement
+		
+	env
+		change space (trace route)
+		do activity
+			eat harvest until
+		transfert message
+	semanet
+		define minimal semanet
+			? sense node (vision/touch/hearing)
+			space room
 
 Question
 	? ingame date

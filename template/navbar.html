@@ -1,0 +1,41 @@
+
+
+<nav class="container bg-dark">
+	<ul class="row">
+		<li class="nav-item :: if(false) :: active :: endif ::">
+			<a class="nav-link" href="/">
+				Home
+			</a>
+		</li>
+		<li class="nav-item :: if(false) :: active :: endif ::">
+			<a class="nav-link" href="/worldmap">
+				Worldmap
+			</a>
+		</li>
+		<li class="nav-item :: if(false) :: active :: endif ::">
+			<a class="nav-link" href="/admin">
+				Admin
+			</a>
+		</li>
+		: if page.user != null && page.user.getPlayer() != null :
+		: endif :
+		:: if page.user != null ::
+		<li class="nav-item :: if(false) :: active :: endif ::">
+			<a class="nav-link" href="/asset">
+				Asset
+			</a>
+		</li>
+		<li class="nav-item :: if(false) :: active :: endif ::">
+			<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				:: page.user.getEmail ::
+			</a>
+			<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+				<a class="dropdown-item" href="/profile">Profile</a>
+				<form id="form_signout" class="dropdown-item" action="/log-off">
+					<button type="submit">Log off</submit>
+				</form>
+			</div>
+		</li>
+		:: endif ::
+	</ul>
+</nav>

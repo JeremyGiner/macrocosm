@@ -118,6 +118,8 @@ class Controller {
 		
 		_oSessionManager = oSessionManager;
 		
+		trace('Processing action : ' + oAction.getProcedureName());
+		
 		// Case : composite action
 		if ( oAction.getProcedureName() == 'composite' ) {
 			var aAction :Array<Dynamic> = cast oAction.getParam();

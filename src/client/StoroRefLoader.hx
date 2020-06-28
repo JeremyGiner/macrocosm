@@ -7,12 +7,13 @@ import storo.StoroReference;
 import haxe.Json;
 import js.html.XMLHttpRequestResponseType;
 import client.response_body_decoder.ResponseBodyRibbon;
+import unveil.loader.LoaderXhrJson.JsonFactory;
 
 /**
  * ...
  * @author 
  */
-class StoroRefLoader extends LoaderXhrJson {
+class StoroRefLoader extends LoaderXhrJson<Dynamic> {
 
 	var _oModel :Model;
 	var _sParentKey :String;
@@ -50,14 +51,14 @@ class StoroRefLoader extends LoaderXhrJson {
 				return;
 			}
 			
-			_oBodyFactory = new FactoryCloner( {
+			_oBodyFactory = new JsonFactory(new FactoryCloner( {
 				procedure: "server.controller.procedure.RetrieveObject",
 				param: {
 					id: oRef.getEntityId(), 
 					storage: oRef.getStorageId(),
 				}
 				
-			} );
+			} ) );
 			
 			_f(resolve,reject);
 		});

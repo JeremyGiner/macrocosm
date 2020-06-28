@@ -4,23 +4,23 @@
 		<div class="col-auto">
 			<ul>
 			:: for storage in page.storage_key_list ::
-				<li><a href="storage/:: storage ::">:: storage ::</a>
+				<li><a href="/admin/:: storage ::">:: storage ::</a>
 			:: endfor ::
 			</ul>
 		</div>
 		<div class="col">
-			:: if page.storage_current == null ::
+			:: if page.admin_entity_page == null ::
 				<p class="muted">No storage selected</p>
 			:: else ::
 			<div class="row">
-			:: for object in storage_current.page ::
+			:: for object in page.admin_entity_page ::
 				<div class="col">
 					<div class="row">
 					<div class="col">
-						:: object.type.label ::
+						:: object.label ::
 					</div>
 					<div class="col-auto">
-						:: object.key ::
+						:: object.id ::
 					</div>
 					</div>
 				</div>

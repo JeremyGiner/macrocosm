@@ -69,9 +69,10 @@ class RequestHandler implements IRequestHandler {
 		var oResponse :Bytes = getResponse( oRequest ).toBytes();
 		
 		//trace( StringTools.urlEncode("HTTP/1.1 404 Not found\r\nContent-Type: text/html\r\nContent-Length: 22\r\n\r\nSysError(Can't read /)"));
+		oClientSocket.output.prepare( oResponse.length );
 		oClientSocket.output.write( oResponse );
 		oClientSocket.output.flush(); // doesn't pause thread as i would expect
-		Sys.sleep(1); // fix flush, doesn't work TODO fix
+		//Sys.sleep(1); // fix flush, doesn't work TODO fix
 		oClientSocket.close();
 	}
 	
@@ -128,6 +129,7 @@ class RequestHandler implements IRequestHandler {
 				return Response.createSimple(403, 'Access denied', o.getMessage() );
 			} else if ( Std.is(o, Error) ) {
 				// TODO : log message
+				trace(o.getCallstack() + ' - ' + o.getMessage());
 				return Response.createSimple(500, 'Server internal error');
 			}
 			

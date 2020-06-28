@@ -11,6 +11,7 @@ import js.html.XMLHttpRequest;
 import js.lib.RegExp;
 import client.response_body_decoder.ResponseBodyRibbon;
 import sweet.functor.builder.FactoryCloner;
+import unveil.loader.ALoaderCalculated;
 import unveil.tool.VPathAccessor;
 import unveil.controller.FormController;
 import unveil.template.Compiler;
@@ -23,6 +24,7 @@ import unveil.View;
 import unveil.controller.PageController;
 import unveil.controller.FormController;
 import js.html.XMLHttpRequestResponseType;
+import unveil.loader.ILoader;
 
 /**
  * ...
@@ -37,8 +39,8 @@ class Main {
 		// Model
 		var oModel = new Model();
 		
-		var mModelConfig = [
-			'worldmap' => new LoaderXhrJson('POST', '/_game', [], new FactoryCloner({
+		var mModelConfig :StringMap<ILoader<Dynamic>> = [
+			'worldmap' => new LoaderXhrJson<Dynamic>('POST', '/_game', [], new FactoryCloner({
 				procedure: "server.controller.procedure.RetrieveObject", 
 				param: {
 					storage: 'Default',
@@ -60,14 +62,11 @@ class Main {
 			
 			// Admin
 			'storage_key_list' => new GameProcedureLoader("RetrieveStorageKeyList", null),
-			'entity_page' => new GameProcedureLoader("RetrieveStorageEntityPage", {
-				storage: 'Default',
-				page: 1,
-				count: 20,
-			}),
+			'entity_page' => new TestLoader( oModel ),
+			'admin_entity_page' => new AdminEntityListPageView( oModel ),
 		];
 		for ( s => o in mModelConfig )
-			oModel.setEntity( s, o );
+			oModel.setEntityLoader( s, o, false );
 		
 		//__________________
 		// View
@@ -88,6 +87,8 @@ class Main {
 			{key: 'player_create_form', template: Resource.getString('player_create_form')},
 			{key: 'player', template: Resource.getString('player')},
 			{key: 'admin', template: Resource.getString('admin')},
+			
+			{key: 'not_found', template: Resource.getString('not_found')},
 		];
 		for ( oItem in aTemplate ) {
 			oView.addTemplate( oItem.key, oCompiler.compile(oItem.template) );
@@ -99,7 +100,7 @@ class Main {
 		var mPageHandle :Array<PageHandle> = [
 			{
 				id: 'home',
-				path_pattern: new RegExp('\\/'),
+				path_pattern: new RegExp('^\\/$'),
 				page_data: {
 					hello: true,
 					content: 'page content',
@@ -109,52 +110,45 @@ class Main {
 			},
 			{
 				id: 'player',
-				path_pattern: new RegExp('\\/player'),
+				path_pattern: new RegExp('^\\/player$'),
 				page_data: null,
 				model_load: ['user','player'],
 			},
 			{
 				id: 'worldmap',
-				path_pattern: new RegExp('\\/worldmap'),
+				path_pattern: new RegExp('^\\/worldmap$'),
 				page_data: null,
 				model_load: ['user','player','worldmap'],
 			},
 			{
 				id: 'asset',
-				path_pattern: new RegExp('\\/asset'),
+				path_pattern: new RegExp('^\\/asset$'),
 				page_data: null,
 				model_load: ['user','player','prodtype_ar'],
 			},
 			{
 				id: 'debug',
-				path_pattern: new RegExp('\\/debug'),
+				path_pattern: new RegExp('^\\/debug$'),
 				page_data: null,
 				model_load: ['user','player'],
 			},
 			{
 				id: 'asset_buy',
-				path_pattern: new RegExp('\\/buy(\\/\\d+)?'),
+				path_pattern: new RegExp('^\\/buy(\\/\\d+)?$'),
 				page_data: null,
 				model_load: ['user','player'],
 			},
 			
 			{
-				id: 'semanet',
-				path_pattern: new RegExp('\\/semanet(\\/\\d+)?'),
-				page_data: null,
-				model_load: ['semanet'],
-			},
-			
-			{
 				id: 'admin',
-				path_pattern: new RegExp('\\/admin(\\/\\s+)?'),
-				page_data: {storage_current: null,},
-				model_load: ['storage_key_list'],
+				path_pattern: new RegExp('^\\/admin\\/?([^\\/]+)?$','gm'),
+				page_data: null,
+				model_load: ['storage_key_list','admin_entity_page'],
 			},
 			
 			{
 				id: 'not_found',
-				path_pattern: new RegExp('\\/not-found'),
+				path_pattern: new RegExp('^\\/not-found$'),
 				page_data: null,
 				model_load: ['user','player'],
 			},
@@ -179,12 +173,76 @@ class Main {
 	
 }
 
-class GameProcedureLoader extends LoaderXhrJson {
+class GameProcedureLoader extends LoaderXhrJson<Dynamic> {
 	
 	public function new( procedure :String, oParam :Dynamic ) {
 		super('POST', '/_game', [], new FactoryCloner({
 			procedure: "server.controller.procedure."+procedure, 
 			param: oParam,
 		}), new ResponseBodyRibbon(), XMLHttpRequestResponseType.ARRAYBUFFER);
+	}
+}
+
+class TestLoader extends LoaderXhrJson<Dynamic> {
+	
+	var _oModel :Model;
+	
+	public function new( oModel :Model ) {
+		_oModel = oModel;
+		super('POST', '/_game', [], null, XMLHttpRequestResponseType.ARRAYBUFFER);
+	}
+	
+	override public function callback(resolve:String->Void, reject:Dynamic->Void) {
+		var sStorage = null;
+		try { sStorage = _oModel.getEntity('_route').param[0]; } catch ( e :Dynamic ){ /*ignore */}
+		
+		if ( sStorage == null ) {
+			resolve( null );
+			return;
+		}
+		
+		super.callback( resolve, reject );
+	}
+	
+	override public function handleResponse( oReq :XMLHttpRequest ) :Dynamic {
+		var o = ResponseBodyRibbon.singleton().apply(oReq);
+		return o;
+	}
+	
+	override public function getBody() {
+		
+		var sStorage = null;
+		var iPage = 0;
+		try { sStorage = _oModel.getEntity('_route').param[0]; } catch ( e :Dynamic ){ /*ignore */}
+		//try { iPage = oModel.getEntity('route').param.page; } catch ( e :Dynamic ){ /*ignore */}
+		
+		return Json.stringify({
+			procedure: "server.controller.procedure.RetrieveStorageObjectPage", 
+			param: {
+				storage: sStorage,
+				page: iPage,
+				count: 20,
+			},
+		});
+	}
+}
+
+class AdminEntityListPageView extends ALoaderCalculated<Dynamic> {
+	public function new( oModel :Model ) {
+		super(oModel,['entity_page']);
+	}
+	
+	override public function calc(a:Array<Dynamic>):Dynamic {
+		
+		if ( a[0] == null )
+			return null;
+		
+		var aRes = [];
+		for ( o in cast(a[0],Array<Dynamic>) )
+			aRes.push( {
+				id: o.id,
+				label: Type.getClassName(Type.getClass(o.data))
+			} );
+		return aRes;
 	}
 }

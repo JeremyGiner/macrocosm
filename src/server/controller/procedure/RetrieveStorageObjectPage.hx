@@ -34,7 +34,7 @@ class RetrieveStorageObjectPage extends AControllerProcedure<DbGetObjPage> {
 			
 			// TODO : use page to offset iteration
 			
-			aRes.push( oStorage.get(oKey,true) );
+			aRes.push( {id: oKey, data: oStorage.get(oKey,true)} );
 			
 			if ( aRes.length == oParam.count )
 				break;
